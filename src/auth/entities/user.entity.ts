@@ -12,65 +12,51 @@ import {
 export class User extends Model {
   @PrimaryKey
   @Default(DataType.UUIDV4)
-  @Column(DataType.UUID)
-  declare id: string;
+  @Column({
+    type: DataType.UUID,
+    field: 'user_id',
+  })
+  declare userId: string;
 
   @Unique
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  email: string;
+  declare email: string;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: true,
   })
-  password: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  firstName: string;
-
-  @Column({
-    type: DataType.STRING,
-  })
-  lastName?: string;
-
-  @Column({
-    type: DataType.ENUM('male', 'female', 'other'),
-  })
-  gender?: 'male' | 'female' | 'other';
-
-  @Column({
-    type: DataType.DATEONLY,
-  })
-  dateOfBirth?: Date;
-
-  @Column(DataType.STRING)
-  profilePicture?: string;
-
-  @Column(DataType.TEXT)
-  bio?: string;
-
-  @Column(DataType.STRING)
-  location?: string;
-
-  @Column(DataType.JSON)
-  interests?: string[];
+  declare password: string;
 
   @Default(false)
-  @Column(DataType.BOOLEAN)
-  isVerified?: boolean;
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+    field: 'is_verified',
+  })
+  declare isVerified: boolean;
 
-  @Column(DataType.STRING)
-  verificationCode?: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    field: 'verification_code',
+  })
+  declare verificationCode: string | null;
 
-  @Column(DataType.STRING)
-  resetPasswordToken?: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    field: 'reset_password_token',
+  })
+  declare resetPasswordToken: string | null;
 
-  @Column(DataType.DATE)
-  resetPasswordExpires?: Date;
+  @Column({
+    type: DataType.DATE,
+    allowNull: true,
+    field: 'reset_password_expires',
+  })
+  declare resetPasswordExpires: Date | null;
 }
