@@ -1,12 +1,16 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, MethodNotAllowedException, NotFoundException } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
+import { JwtService } from '@nestjs/jwt';
+import response from 'src/core/commonfunctions/response.body';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private jwtService: JwtService,
+    // await this.jwtService.signAsync(payload)
     @InjectModel(User)
     private userModel: typeof User,
   ) { }
@@ -48,7 +52,9 @@ export class AuthService {
       const newUser = await this.userModel.create({
         email
       });
-      console.log("details: " + newUser);
+
+      // todo: sent email to the user email using redis and nodemailer
+
       const { password: _, ...userWithoutPass } = newUser.get({ plain: true });
 
       return {
@@ -58,6 +64,44 @@ export class AuthService {
 
     } catch (exc) {
       // console.log(`exception: ${exc}`);
+    }
+  }
+
+  async signupWithEmailPassword(reqBody: any) {
+    const { password, email } = reqBody;
+
+    try {
+      const existingUser = await this.userModel.findOne({ where: { email } });
+
+      if (!existingUser) {
+        throw new BadRequestException("The user does not exist");
+      }
+
+      if (existingUser && existingUser.get({ plain: true }).password !== null) {
+        throw new MethodNotAllowedException("The password is set already");
+      }
+
+      const user = await this.userModel.update(
+        { password },
+        {
+          where: { email }
+        }
+      );
+      if (user[0] === 1)
+        return response(200, "Successfully updated");
+      else {
+
+      }
+    } catch (err) {
+
+    }
+  }
+  async signupWithEmailVerify(reqBody: any) {
+    const { email, otp } = reqBody;
+    try {
+
+    } catch (err) {
+
     }
   }
 

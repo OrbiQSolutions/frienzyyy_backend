@@ -1,0 +1,7 @@
+export const HttpStatus = {
+  POST_SUCCESS: 201,
+  GET_SUCCESS: 200,
+  INTERNAL_SERVER_ERROR: 500,
+  BAD_STATUS: 400,
+  UNAUTHORIZED: 401,
+}

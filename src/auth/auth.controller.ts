@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Put
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
@@ -15,6 +24,16 @@ export class AuthController {
   @Post('/signup-with-email')
   createWithEmail(@Body() reqBody: any) {
     return this.authService.signupWithEmail(reqBody);
+  }
+
+  @Put('/signup-with-email-password')
+  createWithEmailPassword(@Body() reqBody: any) {
+    return this.authService.signupWithEmailPassword(reqBody);
+  }
+
+  @Post('/signup-with-email-verify')
+  createWithEmailVerify(@Body() reqBody: any) {
+    return this.authService.signupWithEmailVerify(reqBody);
   }
 
   @Get()
