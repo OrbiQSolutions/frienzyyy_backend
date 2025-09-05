@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './auth/entities/user.entity';
+import { UserProfile } from './auth/entities/user.profile.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { User } from './auth/entities/user.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      models: [User],
+      models: [User, UserProfile],
       autoLoadModels: true,
       synchronize: true,
       logging: false,

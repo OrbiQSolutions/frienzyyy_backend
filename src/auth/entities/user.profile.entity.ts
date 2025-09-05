@@ -2,41 +2,78 @@ import {
   Table,
   Column,
   Model,
-  DataType
+  DataType,
+  Default,
+  ForeignKey,
+  BelongsTo
 } from 'sequelize-typescript';
+import { User } from './user.entity';
 
 @Table({ tableName: 'users_profile' })
 export class UserProfile extends Model {
+  // @Column({
+  //   type: DataType.STRING,
+  //   allowNull: false,
+  // })
+  // firstName: string;
+
+  // @Column({
+  //   type: DataType.STRING,
+  // })
+  // lastName?: string;
+
+  @ForeignKey(() => User)
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
     allowNull: false,
+    unique: true,
+    field: 'user_id',
   })
-  firstName: string;
+  declare userId: string;
 
   @Column({
+    field: 'full_name',
     type: DataType.STRING,
+    allowNull: false
   })
-  lastName?: string;
+  declare fullName?: string;
 
+  @Default('other')
   @Column({
     type: DataType.ENUM('male', 'female', 'other'),
+    allowNull: false,
   })
-  gender?: 'male' | 'female' | 'other';
+  declare gender?: 'male' | 'female' | 'other';
 
   @Column({
     type: DataType.DATEONLY,
   })
-  dateOfBirth?: Date;
+  declare dateOfBirth?: Date;
 
-  @Column(DataType.STRING)
-  profilePicture?: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: true
+  })
+  declare profilePicture?: string;
 
-  @Column(DataType.TEXT)
-  bio?: string;
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  declare bio?: string;
 
-  @Column(DataType.STRING)
-  location?: string;
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare location?: string;
 
-  @Column(DataType.JSON)
-  interests?: string[];
+  @Column({
+    type: DataType.JSON,
+    allowNull: true,
+  })
+  declare interests?: string[];
+
+  @BelongsTo(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  declare user: User;
 }

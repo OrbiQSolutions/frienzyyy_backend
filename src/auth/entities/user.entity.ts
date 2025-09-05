@@ -6,13 +6,16 @@ import {
   PrimaryKey,
   Default,
   Unique,
+  HasOne,
 } from 'sequelize-typescript';
+import { UserProfile } from './user.profile.entity';
 
 @Table({ tableName: 'users' })
 export class User extends Model {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column({
+    unique: true,
     type: DataType.UUID,
     field: 'user_id',
   })
@@ -59,4 +62,7 @@ export class User extends Model {
     field: 'reset_password_expires',
   })
   declare resetPasswordExpires: Date | null;
+
+  @HasOne(() => UserProfile)
+  declare profile: UserProfile;
 }

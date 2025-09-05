@@ -1,10 +1,19 @@
-import { BadRequestException, ForbiddenException, Injectable, MethodNotAllowedException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  MethodNotAllowedException,
+  NotFoundException
+} from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import response from 'src/core/commonfunctions/response.body';
+import { UserProfile } from './entities/user.profile.entity';
+import { message } from 'src/core/constants/message.constants';
+import { CreateWithEmailVerify } from './dto/create.with.email.verify';
+import { CreateWithEmailName } from './dto/create.with.email.name';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +22,8 @@ export class AuthService {
     // await this.jwtService.signAsync(payload)
     @InjectModel(User)
     private userModel: typeof User,
+    @InjectModel(UserProfile)
+    private userProfileModel: typeof UserProfile
   ) { }
 
   async signup(createAuthDto: CreateAuthDto) {
@@ -74,7 +85,7 @@ export class AuthService {
       const existingUser = await this.userModel.findOne({ where: { email } });
 
       if (!existingUser) {
-        throw new BadRequestException("The user does not exist");
+        throw new BadRequestException(message.USER_DOESNT_EXIST);
       }
 
       if (existingUser && existingUser.get({ plain: true }).password !== null) {
@@ -96,10 +107,37 @@ export class AuthService {
 
     }
   }
-  async signupWithEmailVerify(reqBody: any) {
+  async signupWithEmailVerify(reqBody: CreateWithEmailVerify) {
     const { email, otp } = reqBody;
     try {
 
+    } catch (err) {
+
+    }
+  }
+
+  async signupWithEmailName(reqBody: CreateWithEmailName) {
+    const { email, name } = reqBody;
+    try {
+      const existingUser = await this.userModel.findOne({ where: { email } });
+
+      if (!existingUser) {
+        throw new BadRequestException(message.USER_DOESNT_EXIST);
+      }
+      const userId = existingUser.get({ plain: true }).userId;
+
+      const existUserProfile = await this.userProfileModel.findOne({ where: { userId } });
+      
+      if (existUserProfile) {
+        throw new MethodNotAllowedException(message.DATA_ALREADY_ADDED);
+      }
+
+      const userProfileData = this.userProfileModel.create({
+        userId: existingUser.get({ plain: true }).userId,
+        fullName: name
+      });
+
+      return response(201, message.NAME_UPDATED_SUCCESSFULLY, (await userProfileData).get({ plain: true }));
     } catch (err) {
 
     }
