@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CreateWithEmailVerify } from './dto/create.with.email.verify';
+import { CreateWithEmailDob } from './dto/create.with.email.dob';
 
 @Controller('auth')
 export class AuthController {
@@ -40,6 +41,11 @@ export class AuthController {
   @Post('/signup-with-email-name')
   createWithEmailName(@Body() reqBody: any) {
     return this.authService.signupWithEmailName(reqBody);
+  }
+
+  @Post('/signup-with-email-date-of-birth')
+  createWithEmailDob(@Body() reqBody: CreateWithEmailDob) {
+    return this.authService.signupWithEmailDob(reqBody);
   }
 
   @Get()

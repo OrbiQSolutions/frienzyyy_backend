@@ -14,6 +14,7 @@ import { UserProfile } from './entities/user.profile.entity';
 import { message } from 'src/core/constants/message.constants';
 import { CreateWithEmailVerify } from './dto/create.with.email.verify';
 import { CreateWithEmailName } from './dto/create.with.email.name';
+import { CreateWithEmailDob } from './dto/create.with.email.dob';
 
 @Injectable()
 export class AuthService {
@@ -127,7 +128,7 @@ export class AuthService {
       const userId = existingUser.get({ plain: true }).userId;
 
       const existUserProfile = await this.userProfileModel.findOne({ where: { userId } });
-      
+
       if (existUserProfile) {
         throw new MethodNotAllowedException(message.DATA_ALREADY_ADDED);
       }
@@ -138,6 +139,37 @@ export class AuthService {
       });
 
       return response(201, message.NAME_UPDATED_SUCCESSFULLY, (await userProfileData).get({ plain: true }));
+    } catch (err) {
+
+    }
+  }
+
+  async signupWithEmailDob(reqBody: CreateWithEmailDob) {
+    const { dob, email } = reqBody;
+    try {
+      const existingUser = await this.userModel.findOne({ where: { email } });
+
+      if (!existingUser) {
+        throw new BadRequestException(message.USER_DOESNT_EXIST);
+      }
+
+      const userId = existingUser.get({ plain: true }).userId;
+
+      const existUserProfile = await this.userProfileModel.findOne({ where: { userId } });
+
+      const dateOfBirth = existUserProfile?.get({ plain: true }).dateOfBirth;
+
+      if (existUserProfile && dateOfBirth !== null) {
+        throw new MethodNotAllowedException(message.DATA_ALREADY_ADDED);
+      }
+
+      const userProfile = await this.userProfileModel.update({ dateOfBirth: dob }, {
+        where: {
+          userId
+        }
+      });
+
+      return response(201, message.DATA_ALREADY_ADDED, userProfile);
     } catch (err) {
 
     }

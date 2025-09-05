@@ -47,12 +47,14 @@ export class UserProfile extends Model {
 
   @Column({
     type: DataType.DATEONLY,
+    field: 'date_of_birth'
   })
   declare dateOfBirth?: Date;
 
   @Column({
     type: DataType.STRING,
-    allowNull: true
+    allowNull: true,
+    field: 'profile_picture'
   })
   declare profilePicture?: string;
 
