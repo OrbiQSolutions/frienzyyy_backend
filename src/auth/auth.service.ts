@@ -2,7 +2,8 @@ import {
   BadRequestException,
   Injectable,
   MethodNotAllowedException,
-  NotFoundException
+  NotFoundException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
@@ -20,12 +21,15 @@ import { CreateWithEmailDob } from './dto/create.with.email.dob';
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    // await this.jwtService.signAsync(payload)
     @InjectModel(User)
     private userModel: typeof User,
     @InjectModel(UserProfile)
     private userProfileModel: typeof UserProfile
   ) { }
+
+  private generateFourDigitRandomNumber(): number {
+    return Math.floor(Math.random() * 9000) + 1000;
+  }
 
   async signup(createAuthDto: CreateAuthDto) {
     const { email, password, firstName, lastName } = createAuthDto;
@@ -61,8 +65,10 @@ export class AuthService {
         throw new BadRequestException('Email already registered');
       }
 
+      const otp = this.generateFourDigitRandomNumber();
+
       const newUser = await this.userModel.create({
-        email
+        email, otp
       });
 
       // todo: sent email to the user email using redis and nodemailer
@@ -108,12 +114,24 @@ export class AuthService {
 
     }
   }
+
   async signupWithEmailVerify(reqBody: CreateWithEmailVerify) {
     const { email, otp } = reqBody;
     try {
 
-    } catch (err) {
+      const user = await this.userModel.findOne({ where: { email } });
 
+      const userOtp: string = user?.get({ plain: true }).otp;
+      const userId: string = user?.get({ plain: true }).userId;
+      if (otp !== userOtp) throw new UnauthorizedException("Incorrect OTP entered");
+
+      const token = this.jwtService.sign({ email, userId });
+
+      return response(201, "OTP verification completed", "User has been verified", token);
+
+    } catch (err) {
+      console.log(err);
+      return response(403, "Invalid OTP", err);
     }
   }
 

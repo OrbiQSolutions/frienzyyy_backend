@@ -45,9 +45,9 @@ export class User extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: true,
-    field: 'verification_code',
+    field: 'user_otp'
   })
-  declare verificationCode: string | null;
+  declare otp: string;
 
   @Column({
     type: DataType.STRING,

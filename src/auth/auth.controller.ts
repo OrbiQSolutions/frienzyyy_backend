@@ -6,13 +6,15 @@ import {
   Patch,
   Param,
   Delete,
-  Put
+  Put,
+  UseGuards
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CreateWithEmailVerify } from './dto/create.with.email.verify';
 import { CreateWithEmailDob } from './dto/create.with.email.dob';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -43,7 +45,7 @@ export class AuthController {
     return this.authService.signupWithEmailName(reqBody);
   }
 
-  @Post('/signup-with-email-date-of-birth')
+  @Put('/signup-with-email-date-of-birth')
   createWithEmailDob(@Body() reqBody: CreateWithEmailDob) {
     return this.authService.signupWithEmailDob(reqBody);
   }
