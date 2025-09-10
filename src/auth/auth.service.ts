@@ -16,6 +16,7 @@ import { message } from 'src/core/constants/message.constants';
 import { CreateWithEmailVerify } from './dto/create.with.email.verify';
 import { CreateWithEmailName } from './dto/create.with.email.name';
 import { CreateWithEmailDob } from './dto/create.with.email.dob';
+import { where } from 'sequelize';
 
 @Injectable()
 export class AuthService {
@@ -124,6 +125,12 @@ export class AuthService {
       const userOtp: string = user?.get({ plain: true }).otp;
       const userId: string = user?.get({ plain: true }).userId;
       if (otp !== userOtp) throw new UnauthorizedException("Incorrect OTP entered");
+
+      await this.userModel.update({ otp: null, isVerified: true , }, {
+        where: {
+          userId
+        }
+      });
 
       const token = this.jwtService.sign({ email, userId });
 

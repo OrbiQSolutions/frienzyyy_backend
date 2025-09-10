@@ -8,12 +8,12 @@ async function bootstrap() {
   app.setGlobalPrefix('v1/api');
 
   const config = new DocumentBuilder()
-    .setTitle('Frienzyyy backend')
+    .setTitle('Frienzyyy Backend V1.0.0')
     .setDescription('The frienzyyy app which is a dating app')
     .setVersion('1.0')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('api/docs', app, documentFactory);
 
   const sequelize = app.get(Sequelize);
   await sequelize.sync({ alter: true });
