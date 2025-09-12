@@ -17,15 +17,22 @@ import { CreateWithEmailVerify } from './dto/create.with.email.verify';
 import { CreateWithEmailName } from './dto/create.with.email.name';
 import { CreateWithEmailDob } from './dto/create.with.email.dob';
 import { where } from 'sequelize';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
+
     @InjectModel(User)
     private userModel: typeof User,
+
     @InjectModel(UserProfile)
-    private userProfileModel: typeof UserProfile
+    private userProfileModel: typeof UserProfile,
+
+    @InjectQueue(process.env.REDIS_EMAIL_QUEUE)
+    private readonly emailQueue: Queue,
   ) { }
 
   private generateFourDigitRandomNumber(): number {
@@ -72,7 +79,14 @@ export class AuthService {
         email, otp
       });
 
-      // todo: sent email to the user email using redis and nodemailer
+      await this.emailQueue.add('signup-email', {
+        to: email,
+        subject: 'Frienzyyy - Email Verification',
+        text: `Your OTP for email verification is ${otp}`,
+        html: `<p>Your OTP for email verification is <strong>${otp}</strong></p>`,
+      });
+
+      console.log("email added in the queue");
 
       const { password: _, ...userWithoutPass } = newUser.get({ plain: true });
 
@@ -82,11 +96,12 @@ export class AuthService {
       };
 
     } catch (exc) {
-      // console.log(`exception: ${exc}`);
+      console.log(`exception: ${exc}`);
     }
   }
 
   async signupWithEmailPassword(reqBody: any) {
+    // TODO: use guards for token verification and the userId will be extracted from the token
     const { password, email } = reqBody;
 
     try {
@@ -126,7 +141,7 @@ export class AuthService {
       const userId: string = user?.get({ plain: true }).userId;
       if (otp !== userOtp) throw new UnauthorizedException("Incorrect OTP entered");
 
-      await this.userModel.update({ otp: null, isVerified: true , }, {
+      await this.userModel.update({ otp: null, isVerified: true, }, {
         where: {
           userId
         }

@@ -7,15 +7,25 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './auth/entities/user.entity';
 import { UserProfile } from './auth/entities/user.profile.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ".env" }),
     AuthModule,
+    BullModule.forRoot({
+      connection: {
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT),
+      },
+      defaultJobOptions: {
+        attempts: 3,
+      }
+    }),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '7d' },
+      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
     }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
@@ -29,7 +39,6 @@ import { JwtModule } from '@nestjs/jwt';
       synchronize: true,
       logging: false,
     }),
-
   ],
   controllers: [AppController],
   providers: [AppService],
