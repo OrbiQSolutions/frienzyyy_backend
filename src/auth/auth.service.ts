@@ -31,7 +31,7 @@ export class AuthService {
     @InjectModel(UserProfile)
     private userProfileModel: typeof UserProfile,
 
-    @InjectQueue(process.env.REDIS_EMAIL_QUEUE)
+    @InjectQueue("emails")
     private readonly emailQueue: Queue,
   ) { }
 
