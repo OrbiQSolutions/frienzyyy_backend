@@ -2,12 +2,20 @@ export default function response(
   status: any,
   message: string,
   data?: any,
-  token?: string
+  token?: string,
 ) {
-  return {
+  let res: any = {
     status,
     message,
-    data,
-    token
   }
+
+  if (token) {
+    res.token = token;
+  }
+
+  if (data) {
+    res.data = data;
+  }
+
+  return res;
 }

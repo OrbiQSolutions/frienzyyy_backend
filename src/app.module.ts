@@ -8,6 +8,7 @@ import { User } from './auth/entities/user.entity';
 import { UserProfile } from './auth/entities/user.profile.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { BullModule } from '@nestjs/bullmq';
+import { AdminUsersModule } from './admin-users/admin.users.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { BullModule } from '@nestjs/bullmq';
       synchronize: true,
       logging: false,
     }),
+    AdminUsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

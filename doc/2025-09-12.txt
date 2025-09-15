@@ -1,4 +1,5 @@
 Redis added along with video tutorial:
 youtube link: https://youtu.be/vFI_Nf2PWFQ
 
-need to add nodemailer
+nodemailer has been added on 13 sept 2025
+
