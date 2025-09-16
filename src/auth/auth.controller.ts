@@ -10,7 +10,8 @@ import {
   UseGuards,
   Res,
   BadRequestException,
-  UnauthorizedException
+  UnauthorizedException,
+  Req
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -18,7 +19,8 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CreateWithEmailVerify } from './dto/create.with.email.verify';
 import { CreateWithEmailDob } from './dto/create.with.email.dob';
 // import { AuthGuard } from './auth.guard';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
+import { AuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -38,10 +40,10 @@ export class AuthController {
     return res.send(response);
   }
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Put('/signup-with-email-password')
-  createWithEmailPassword(@Body() reqBody: any) {
-    return this.authService.signupWithEmailPassword(reqBody);
+  createWithEmailPassword(@Body() reqBody: any, @Req() req: Request) {
+    return this.authService.signupWithEmailPassword(reqBody, req);
   }
 
   @Post('/signup-with-email-verify')

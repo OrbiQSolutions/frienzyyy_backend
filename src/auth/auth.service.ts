@@ -19,7 +19,7 @@ import { CreateWithEmailName } from './dto/create.with.email.name';
 import { CreateWithEmailDob } from './dto/create.with.email.dob';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -105,8 +105,10 @@ export class AuthService {
     }
   }
 
-  async signupWithEmailPassword(reqBody: any) {
-    const { password, email } = reqBody;
+  async signupWithEmailPassword(reqBody: any, request: Request) {
+
+    const { email } = request['user'];
+    const { password } = reqBody;
 
     this.logger.log(`Setting password for user with email: ${email} ${password}`);
 
