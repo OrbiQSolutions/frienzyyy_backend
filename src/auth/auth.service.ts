@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   MethodNotAllowedException,
   NotFoundException,
   UnauthorizedException
@@ -10,15 +11,15 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
-import response from 'src/core/commonfunctions/response.body';
+import responseBody from 'src/core/commonfunctions/response.body';
 import { UserProfile } from './entities/user.profile.entity';
 import { message } from 'src/core/constants/message.constants';
 import { CreateWithEmailVerify } from './dto/create.with.email.verify';
 import { CreateWithEmailName } from './dto/create.with.email.name';
 import { CreateWithEmailDob } from './dto/create.with.email.dob';
-import { where } from 'sequelize';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import type { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +35,8 @@ export class AuthService {
     @InjectQueue("emails")
     private readonly emailQueue: Queue,
   ) { }
+
+  private readonly logger = new Logger(AuthService.name);
 
   private generateFourDigitRandomNumber(): number {
     return Math.floor(Math.random() * 9000) + 1000;
@@ -63,7 +66,7 @@ export class AuthService {
     };
   }
 
-  async signupWithEmail(reqBody: any) {
+  async signupWithEmail(reqBody: any, response: Response) {
     try {
       const { email } = reqBody;
 
@@ -72,12 +75,15 @@ export class AuthService {
       if (existingUser) {
         throw new BadRequestException('Email already registered');
       }
+      this.logger.log(`No user were found with email: ${email}, proceeding to create a new user.`);
 
       const otp = this.generateFourDigitRandomNumber();
 
       const newUser = await this.userModel.create({
         email, otp
       });
+
+      this.logger.log(`User created with email: ${email}. Proceeding to send verification email.`);
 
       await this.emailQueue.add('signup-email', {
         to: email,
@@ -86,23 +92,23 @@ export class AuthService {
         html: `<p>Your OTP for email verification is <strong>${otp}</strong></p>`,
       });
 
-      console.log("email added in the queue");
+      const { password, otp: _, ...userWithoutPass } = newUser.get({ plain: true });
 
-      const { password: _, ...userWithoutPass } = newUser.get({ plain: true });
+      this.logger.log(`Verification email sent to ${email}.`);
 
       return {
         message: 'User registered successfully',
         data: userWithoutPass
       };
-
-    } catch (exc) {
-      console.log(`exception: ${exc}`);
+    } catch (exception) {
+      return exception;
     }
   }
 
   async signupWithEmailPassword(reqBody: any) {
-    // TODO: use guards for token verification and the userId will be extracted from the token
     const { password, email } = reqBody;
+
+    this.logger.log(`Setting password for user with email: ${email} ${password}`);
 
     try {
       const existingUser = await this.userModel.findOne({ where: { email } });
@@ -122,7 +128,7 @@ export class AuthService {
         }
       );
       if (user[0] === 1)
-        return response(200, "Successfully updated");
+        return responseBody(200, "Successfully updated");
       else {
 
       }
@@ -131,11 +137,15 @@ export class AuthService {
     }
   }
 
-  async signupWithEmailVerify(reqBody: CreateWithEmailVerify) {
+  async signupWithEmailVerify(reqBody: CreateWithEmailVerify, response: Response) {
     const { email, otp } = reqBody;
     try {
 
       const user = await this.userModel.findOne({ where: { email } });
+
+      if (!user) {
+        throw new BadRequestException(message.USER_DOESNT_EXIST);
+      }
 
       const userOtp: string = user?.get({ plain: true }).otp;
       const userId: string = user?.get({ plain: true }).userId;
@@ -149,11 +159,9 @@ export class AuthService {
 
       const token = this.jwtService.sign({ email, userId });
 
-      return response(201, "OTP verification completed", "User has been verified", token);
-
+      return responseBody(201, "OTP verification completed", "User has been verified", token);
     } catch (err) {
-      console.log(err);
-      return response(403, "Invalid OTP", err);
+      return err;
     }
   }
 
@@ -178,7 +186,7 @@ export class AuthService {
         fullName: name
       });
 
-      return response(201, message.NAME_UPDATED_SUCCESSFULLY, (await userProfileData).get({ plain: true }));
+      return responseBody(201, message.NAME_UPDATED_SUCCESSFULLY, (await userProfileData).get({ plain: true }));
     } catch (err) {
 
     }
@@ -209,7 +217,7 @@ export class AuthService {
         }
       });
 
-      return response(201, message.DATA_ALREADY_ADDED, userProfile);
+      return responseBody(201, message.DATA_ALREADY_ADDED, userProfile);
     } catch (err) {
 
     }

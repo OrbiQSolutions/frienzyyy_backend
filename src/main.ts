@@ -6,7 +6,7 @@ import { Sequelize } from 'sequelize-typescript';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('v1/api');
-
+  app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('Frienzyyy Backend V1.0.0')
     .setDescription('The frienzyyy app which is a dating app')

@@ -3,7 +3,8 @@ import { CreateAdminUserDto } from './dto/create-admin.user.dto';
 import { UpdateAdminUserDto } from './dto/update-admin.user.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/auth/entities/user.entity';
-import response from 'src/core/commonfunctions/response.body';
+import responseBody from 'src/core/commonfunctions/response.body';
+import { UserProfile } from 'src/auth/entities/user.profile.entity';
 
 @Injectable()
 export class AdminUsersService {
@@ -18,9 +19,17 @@ export class AdminUsersService {
 
   async getAllUsers() {
     try {
-      const users = await this.userModel.findAndCountAll();
+      const users = await this.userModel.findAndCountAll({
+        attributes: { exclude: ['password'] },
+        include: [
+          {
+            model: UserProfile,
+            required: false
+          }
+        ]
+      });
 
-      return response(200, 'Users retrieved successfully', users);
+      return responseBody(200, 'Users retrieved successfully', users);
     } catch (error) {
       throw error;
     }

@@ -7,14 +7,18 @@ import {
   Param,
   Delete,
   Put,
-  UseGuards
+  UseGuards,
+  Res,
+  BadRequestException,
+  UnauthorizedException
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CreateWithEmailVerify } from './dto/create.with.email.verify';
 import { CreateWithEmailDob } from './dto/create.with.email.dob';
-import { AuthGuard } from './auth.guard';
+// import { AuthGuard } from './auth.guard';
+import type { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -26,18 +30,32 @@ export class AuthController {
   }
 
   @Post('/signup-with-email')
-  createWithEmail(@Body() reqBody: any) {
-    return this.authService.signupWithEmail(reqBody);
+  async createWithEmail(@Body() reqBody: any, @Res() res: Response) {
+    const response = await this.authService.signupWithEmail(reqBody, res);
+    if (response instanceof BadRequestException) {
+      res.status(400);
+    }
+    return res.send(response);
   }
 
+  // @UseGuards(AuthGuard)
   @Put('/signup-with-email-password')
   createWithEmailPassword(@Body() reqBody: any) {
     return this.authService.signupWithEmailPassword(reqBody);
   }
 
   @Post('/signup-with-email-verify')
-  createWithEmailVerify(@Body() reqBody: CreateWithEmailVerify) {
-    return this.authService.signupWithEmailVerify(reqBody);
+  async createWithEmailVerify(@Body() reqBody: CreateWithEmailVerify, @Res() res: Response) {
+    const response = await this.authService.signupWithEmailVerify(reqBody, res);
+    if (response instanceof BadRequestException) {
+      res.status(400);
+    }
+
+    if (response instanceof UnauthorizedException) {
+      res.status(403);
+    }
+
+    return res.send(response);
   }
 
   @Post('/signup-with-email-name')

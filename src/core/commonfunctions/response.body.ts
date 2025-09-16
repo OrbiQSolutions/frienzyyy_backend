@@ -1,4 +1,4 @@
-export default function response(
+export default function responseBody(
   status: any,
   message: string,
   data?: any,
