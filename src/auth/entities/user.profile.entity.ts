@@ -71,10 +71,10 @@ export class UserProfile extends Model {
   declare location?: string;
 
   @Column({
-    type: DataType.JSON,
+    type: DataType.ENUM('relation', 'casual', 'not_sure', 'not_say'),
     allowNull: true,
   })
-  declare interests?: string[];
+  declare interest?: string;
 
   @BelongsTo(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   declare user: User;

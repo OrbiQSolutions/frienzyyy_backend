@@ -16,6 +16,7 @@ import { AdminUsersModule } from './admin-users/admin.users.module';
     AuthModule,
     BullModule.forRoot({
       connection: {
+        // url: process.env.REDIS_URL,
         host: process.env.REDIS_HOST,
         port: Number(process.env.REDIS_PORT),
       },
@@ -39,6 +40,7 @@ import { AdminUsersModule } from './admin-users/admin.users.module';
       autoLoadModels: true,
       synchronize: true,
       logging: false,
+      // uri: process.env.DB_URL,
     }),
     AdminUsersModule,
   ],

@@ -11,7 +11,8 @@ import {
   Res,
   BadRequestException,
   UnauthorizedException,
-  Req
+  Req,
+  MethodNotAllowedException
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
@@ -21,6 +22,8 @@ import { CreateWithEmailDob } from './dto/create.with.email.dob';
 // import { AuthGuard } from './auth.guard';
 import type { Response, Request } from 'express';
 import { AuthGuard } from './auth.guard';
+import { CreateWithEmailGender } from './dto/create.with.email.gender.dto';
+import { CreateWithEmailLookingFor } from './dto/create.with.email.lookingfor.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -60,14 +63,81 @@ export class AuthController {
     return res.send(response);
   }
 
+  @UseGuards(AuthGuard)
   @Post('/signup-with-email-name')
-  createWithEmailName(@Body() reqBody: any) {
-    return this.authService.signupWithEmailName(reqBody);
+  async createWithEmailName(@Body() reqBody: any, @Req() req: Request, @Res() res: Response) {
+    const response = await this.authService.signupWithEmailName(reqBody, req);
+    if (response instanceof BadRequestException) {
+      res.status(400);
+    }
+
+    if (response instanceof MethodNotAllowedException) {
+      res.status(405);
+    }
+
+    return res.send(response);
   }
 
+  @UseGuards(AuthGuard)
   @Put('/signup-with-email-date-of-birth')
-  createWithEmailDob(@Body() reqBody: CreateWithEmailDob) {
-    return this.authService.signupWithEmailDob(reqBody);
+  async createWithEmailDob(@Body() reqBody: CreateWithEmailDob, @Req() req: Request, @Res() res: Response) {
+    const response = await this.authService.signupWithEmailDob(reqBody, req);
+
+    if (response instanceof BadRequestException) {
+      res.status(400);
+    }
+
+    if (response instanceof MethodNotAllowedException) {
+      res.status(405);
+    }
+
+    if (response instanceof UnauthorizedException) {
+      res.status(403);
+      res['message'] = response.message;
+    }
+
+    return res.send(response);
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('/signup-with-email-gender')
+  async createWithEmailGender(@Body() reqBody: CreateWithEmailGender, @Req() req: Request, @Res() res: Response) {
+    const response = await this.authService.signupWithEmailGender(reqBody, req);
+
+    if (response instanceof BadRequestException) {
+      res.status(400);
+    }
+
+    if (response instanceof MethodNotAllowedException) {
+      res.status(405);
+    }
+
+    if (response instanceof UnauthorizedException) {
+      res.status(403);
+      res['message'] = response.message;
+    }
+
+    return res.send(response);
+  }
+  @UseGuards(AuthGuard)
+  @Put('/signup-with-email-interest')
+  async createWithEmailInterest(@Body() reqBody: CreateWithEmailLookingFor, @Req() req: Request, @Res() res: Response) {
+    const response = await this.authService.signupWithEmailInterest(reqBody, req);
+
+    if (response instanceof BadRequestException) {
+      res.status(400);
+    }
+
+    if (response instanceof MethodNotAllowedException) {
+      res.status(405);
+    }
+
+    if (response instanceof UnauthorizedException) {
+      res.status(403);
+      res['message'] = response.message;
+    }
+
+    return res.send(response);
   }
 
   @Get()

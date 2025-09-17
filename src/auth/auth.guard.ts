@@ -15,14 +15,13 @@ export class AuthGuard implements CanActivate {
   private readonly logger = new Logger(AuthGuard.name);
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    this.logger.log(`request reached auth guard`);
 
     const request = context.switchToHttp().getRequest();
 
     const token = this.extractTokenFromHeader(request);
     this.logger.log(`token: ${token}`);
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("No token provided");
     }
     try {
       const payload = await this.jwtService.verifyAsync(
@@ -33,7 +32,7 @@ export class AuthGuard implements CanActivate {
       );
       request.user = payload;
     } catch {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("Invalid or expired token");
     }
     return true;
   }

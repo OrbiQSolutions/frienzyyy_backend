@@ -1,4 +1,3 @@
 export class CreateWithEmailDob {
-  email: String;
-  dob: Date;
+  dob: string;
 }

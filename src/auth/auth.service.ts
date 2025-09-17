@@ -20,6 +20,8 @@ import { CreateWithEmailDob } from './dto/create.with.email.dob';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import type { Response, Request } from 'express';
+import { CreateWithEmailGender } from './dto/create.with.email.gender.dto';
+import { CreateWithEmailLookingFor } from './dto/create.with.email.lookingfor.dto';
 
 @Injectable()
 export class AuthService {
@@ -135,7 +137,7 @@ export class AuthService {
 
       }
     } catch (err) {
-
+      return err;
     }
   }
 
@@ -167,53 +169,62 @@ export class AuthService {
     }
   }
 
-  async signupWithEmailName(reqBody: CreateWithEmailName) {
-    const { email, name } = reqBody;
+  async signupWithEmailName(reqBody: CreateWithEmailName, request: Request) {
+    const { userId } = request['user'];
+    const { name } = reqBody;
     try {
-      const existingUser = await this.userModel.findOne({ where: { email } });
+      const existingUser = await this.userModel.findOne({
+        where: { userId },
+        attributes: {
+          exclude: ['password', 'otp']
+        },
+        include: [{ model: UserProfile, as: 'profile', required: false }]
+      });
 
       if (!existingUser) {
         throw new BadRequestException(message.USER_DOESNT_EXIST);
       }
-      const userId = existingUser.get({ plain: true }).userId;
 
-      const existUserProfile = await this.userProfileModel.findOne({ where: { userId } });
-
-      if (existUserProfile) {
+      if (existingUser && existingUser?.get({ plain: true }).profile !== null) {
         throw new MethodNotAllowedException(message.DATA_ALREADY_ADDED);
       }
 
       const userProfileData = this.userProfileModel.create({
-        userId: existingUser.get({ plain: true }).userId,
+        userId,
         fullName: name
       });
 
       return responseBody(201, message.NAME_UPDATED_SUCCESSFULLY, (await userProfileData).get({ plain: true }));
     } catch (err) {
-
+      return err;
     }
   }
 
-  async signupWithEmailDob(reqBody: CreateWithEmailDob) {
-    const { dob, email } = reqBody;
+  async signupWithEmailDob(reqBody: CreateWithEmailDob, request: Request) {
+    const { userId } = request['user'];
+    const { dob } = reqBody;
     try {
-      const existingUser = await this.userModel.findOne({ where: { email } });
+      const newDob = new Date(dob);
 
-      if (!existingUser) {
+      const existingUser = await this.userModel.findOne({
+        where: { userId },
+        attributes: {
+          exclude: ['password', 'otp']
+        },
+        include: [{ model: UserProfile, as: 'profile', required: false }]
+      });
+
+      if (isNaN(newDob.getTime()) || !existingUser) {
         throw new BadRequestException(message.USER_DOESNT_EXIST);
       }
 
-      const userId = existingUser.get({ plain: true }).userId;
-
-      const existUserProfile = await this.userProfileModel.findOne({ where: { userId } });
-
-      const dateOfBirth = existUserProfile?.get({ plain: true }).dateOfBirth;
-
-      if (existUserProfile && dateOfBirth !== null) {
+      const dateOfBirth = existingUser?.get({ plain: true }).dateOfBirth;
+      console.log(existingUser?.get({ plain: true }));
+      if (existingUser && dateOfBirth) {
         throw new MethodNotAllowedException(message.DATA_ALREADY_ADDED);
       }
-
-      const userProfile = await this.userProfileModel.update({ dateOfBirth: dob }, {
+      console.log(dob);
+      const userProfile = await this.userProfileModel.update({ dateOfBirth: newDob }, {
         where: {
           userId
         }
@@ -221,7 +232,66 @@ export class AuthService {
 
       return responseBody(201, message.DATA_ALREADY_ADDED, userProfile);
     } catch (err) {
+      return err;
+    }
+  }
 
+  async signupWithEmailGender(reqBody: CreateWithEmailGender, request: Request) {
+    const { userId } = request['user'];
+    const { gender } = reqBody;
+    try {
+
+      const existingUser = await this.userModel.findOne({
+        where: { userId },
+        attributes: {
+          exclude: ['password', 'otp']
+        },
+        include: [{ model: UserProfile, as: 'profile', required: false }]
+      });
+
+      if (!existingUser) {
+        throw new BadRequestException(message.USER_DOESNT_EXIST);
+      }
+
+      const userProfile = await this.userProfileModel.update({ gender }, {
+        where: {
+          userId
+        }
+      });
+
+      return responseBody(201, message.DATA_ALREADY_ADDED, userProfile);
+    } catch (err) {
+      return err;
+    }
+  }
+
+
+  async signupWithEmailInterest(reqBody: CreateWithEmailLookingFor, request: Request) {
+    const { userId } = request['user'];
+    const { lookingFor } = reqBody;
+    try {
+
+      const existingUser = await this.userModel.findOne({
+        where: { userId },
+        attributes: {
+          exclude: ['password', 'otp']
+        },
+        include: [{ model: UserProfile, as: 'profile', required: false }]
+      });
+
+      if (!existingUser) {
+        throw new BadRequestException(message.USER_DOESNT_EXIST);
+      }
+
+      const userProfile = await this.userProfileModel.update({ interest: lookingFor }, {
+        where: {
+          userId
+        }
+      });
+
+      return responseBody(201, message.DATA_ALREADY_ADDED, userProfile);
+    } catch (err) {
+      return err;
     }
   }
 
