@@ -33,7 +33,6 @@ export class AdminUsersService {
     } catch (error) {
       throw error;
     }
-    return `This action returns all adminUsers`;
   }
 
   findOne(id: number) {

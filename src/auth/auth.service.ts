@@ -22,6 +22,7 @@ import { Queue } from 'bullmq';
 import type { Response, Request } from 'express';
 import { CreateWithEmailGender } from './dto/create.with.email.gender.dto';
 import { CreateWithEmailLookingFor } from './dto/create.with.email.lookingfor.dto';
+import { AuthLog } from './entities/auth.log.entity';
 
 @Injectable()
 export class AuthService {
@@ -34,14 +35,57 @@ export class AuthService {
     @InjectModel(UserProfile)
     private userProfileModel: typeof UserProfile,
 
+    @InjectModel(AuthLog)
+    private authLogModel: typeof AuthLog,
+
     @InjectQueue("emails")
     private readonly emailQueue: Queue,
   ) { }
 
   private readonly logger = new Logger(AuthService.name);
 
+  private async getToken(email: string, userId: string, deviceName: string): Promise<string> {
+    const token = this.jwtService.sign({ email, userId });
+    const createdAt = Date.now();
+    const log = await this.authLogModel.create({
+      userId,
+      token,
+      deviceOS: deviceName,
+      createdAt
+    });
+    if (!log) {
+      this.logger.log("The log has been registered")
+    } else {
+      this.logger.warn("The loggin was failed")
+    }
+    return token;
+  }
+
   private generateFourDigitRandomNumber(): number {
     return Math.floor(Math.random() * 9000) + 1000;
+  }
+
+  async validateToken(request: Request) {
+    const { userId } = request['user'];
+    const [type, token] = String(request.headers[String(process.env.TOKEN_KEY)]).split(' ');
+    try {
+
+      const prevLog = await this.authLogModel.findOne({
+        where: {
+          userId: String(userId),
+          token: token
+        }
+      });
+
+      if (!prevLog) {
+        throw new UnauthorizedException("The token is invalid or expired");
+      }
+
+      return responseBody(201, "The user is authenticated");
+    } catch (err) {
+      this.logger.error(err);
+      return err;
+    }
   }
 
   async signup(createAuthDto: CreateAuthDto) {
@@ -108,7 +152,6 @@ export class AuthService {
   }
 
   async signupWithEmailPassword(reqBody: any, request: Request) {
-
     const { email } = request['user'];
     const { password } = reqBody;
 
@@ -141,8 +184,9 @@ export class AuthService {
     }
   }
 
-  async signupWithEmailVerify(reqBody: CreateWithEmailVerify, response: Response) {
+  async signupWithEmailVerify(reqBody: CreateWithEmailVerify, request: Request) {
     const { email, otp } = reqBody;
+    const { DeviceOS } = request.headers;
     try {
 
       const user = await this.userModel.findOne({ where: { email } });
@@ -161,7 +205,7 @@ export class AuthService {
         }
       });
 
-      const token = this.jwtService.sign({ email, userId });
+      const token = await this.getToken(email, userId, String(DeviceOS));
 
       return responseBody(201, "OTP verification completed", "User has been verified", token);
     } catch (err) {

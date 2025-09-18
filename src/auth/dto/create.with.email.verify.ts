@@ -1,4 +1,4 @@
 export class CreateWithEmailVerify {
-  email: String;
-  otp: String;
+  email: string;
+  otp: string;
 }

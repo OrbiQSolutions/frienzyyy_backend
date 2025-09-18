@@ -19,7 +19,6 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CreateWithEmailVerify } from './dto/create.with.email.verify';
 import { CreateWithEmailDob } from './dto/create.with.email.dob';
-// import { AuthGuard } from './auth.guard';
 import type { Response, Request } from 'express';
 import { AuthGuard } from './auth.guard';
 import { CreateWithEmailGender } from './dto/create.with.email.gender.dto';
@@ -28,6 +27,21 @@ import { CreateWithEmailLookingFor } from './dto/create.with.email.lookingfor.dt
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
+
+  @UseGuards(AuthGuard)
+  @Post("/validate-token")
+  async validateToken(@Req() req: Request, @Res() res: Response) {
+    console.log("reached validating");
+
+    const response = await this.authService.validateToken(req);
+    if (response instanceof UnauthorizedException) {
+      res.status(403);
+    } else {
+      res.status(201);
+    }
+
+    return res.send(response);
+  }
 
   @Post('/signup')
   create(@Body() createAuthDto: CreateAuthDto) {
@@ -50,8 +64,8 @@ export class AuthController {
   }
 
   @Post('/signup-with-email-verify')
-  async createWithEmailVerify(@Body() reqBody: CreateWithEmailVerify, @Res() res: Response) {
-    const response = await this.authService.signupWithEmailVerify(reqBody, res);
+  async createWithEmailVerify(@Body() reqBody: CreateWithEmailVerify, @Res() res: Response, @Req() req: Request) {
+    const response = await this.authService.signupWithEmailVerify(reqBody, req);
     if (response instanceof BadRequestException) {
       res.status(400);
     }
