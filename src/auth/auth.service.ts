@@ -23,6 +23,8 @@ import type { Response, Request } from 'express';
 import { CreateWithEmailGender } from './dto/create.with.email.gender.dto';
 import { CreateWithEmailLookingFor } from './dto/create.with.email.lookingfor.dto';
 import { AuthLog } from './entities/auth.log.entity';
+import { LoginDto } from './dto/login.dto';
+import { LoginPasswordDto } from './dto/login.password.dto';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +46,7 @@ export class AuthService {
 
   private readonly logger = new Logger(AuthService.name);
 
-  private async getToken(email: string, userId: string, deviceName: string): Promise<string> {
+  private async getToken(email: string, userId: string, deviceName?: string): Promise<string> {
     const token = this.jwtService.sign({ email, userId });
     const createdAt = Date.now();
     const log = await this.authLogModel.create({
@@ -204,7 +206,7 @@ export class AuthService {
           userId
         }
       });
-
+      console.log("Deivce name:", DeviceOS);
       const token = await this.getToken(email, userId, String(DeviceOS));
 
       return responseBody(201, "OTP verification completed", "User has been verified", token);
@@ -352,6 +354,56 @@ export class AuthService {
 
     } catch (err) {
       throw new BadRequestException('Internal server error');
+    }
+  }
+
+  async loginUser(loginDto: LoginDto) {
+    const { email } = loginDto;
+    try {
+      const existingUser = await this.userModel.findOne({
+        where: {
+          email
+        }
+      });
+
+      if (!existingUser) {
+        throw new NotFoundException("The user doesn't exist");
+      }
+
+      return responseBody(201, "The user is successfully found");
+
+    } catch (err) {
+      return err;
+    }
+  }
+
+  async loginUserPassword(loginPassDto: LoginPasswordDto, request: Request) {
+    const { email, password } = loginPassDto;
+    const { DeviceOS } = request.headers;
+    try {
+      console.log(password);
+      console.log(email);
+      const existingUser = await this.userModel.findOne({
+        where: {
+          email,
+          password
+        },
+        attributes: {
+          exclude: ['password']
+        }
+      });
+
+      if (!existingUser) {
+        throw new UnauthorizedException("The combiantion of credentials are not valid");
+      }
+
+      const userId = existingUser.get({ plain: true }).userId;
+
+      const token = await this.getToken(email, userId, String(DeviceOS))
+      return responseBody(201, "The user is successfully found", existingUser, token);
+
+    } catch (err) {
+      return err;
     }
   }
 

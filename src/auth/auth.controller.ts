@@ -23,6 +23,8 @@ import type { Response, Request } from 'express';
 import { AuthGuard } from './auth.guard';
 import { CreateWithEmailGender } from './dto/create.with.email.gender.dto';
 import { CreateWithEmailLookingFor } from './dto/create.with.email.lookingfor.dto';
+import { LoginDto } from './dto/login.dto';
+import { LoginPasswordDto } from './dto/login.password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -152,6 +154,16 @@ export class AuthController {
     }
 
     return res.send(response);
+  }
+
+  @Post('/login-user')
+  async loginUser(@Body() loginDto: LoginDto) {
+    return this.authService.loginUser(loginDto);
+  }
+
+  @Post('/login-user-password')
+  async loginUserPassword(@Body() loginPasswordDto: LoginPasswordDto, @Req() request: Request) {
+    return this.authService.loginUserPassword(loginPasswordDto, request);
   }
 
   @Get()

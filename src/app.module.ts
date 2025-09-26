@@ -39,7 +39,7 @@ import { AdminUsersModule } from './admin-users/admin.users.module';
       models: [User, UserProfile],
       autoLoadModels: true,
       synchronize: true,
-      logging: false,
+      logging: console.log,
       // uri: process.env.DB_URL,
     }),
     AdminUsersModule,
