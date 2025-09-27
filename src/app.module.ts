@@ -9,6 +9,8 @@ import { UserProfile } from './auth/entities/user.profile.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { BullModule } from '@nestjs/bullmq';
 import { AdminUsersModule } from './admin-users/admin.users.module';
+import { UserModule } from './user/user.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -43,6 +45,8 @@ import { AdminUsersModule } from './admin-users/admin.users.module';
       // uri: process.env.DB_URL,
     }),
     AdminUsersModule,
+    UserModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

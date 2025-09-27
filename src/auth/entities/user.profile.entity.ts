@@ -52,13 +52,6 @@ export class UserProfile extends Model {
   declare dateOfBirth?: Date;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: true,
-    field: 'profile_picture'
-  })
-  declare profilePicture?: string;
-
-  @Column({
     type: DataType.TEXT,
     allowNull: true,
   })
@@ -76,6 +69,12 @@ export class UserProfile extends Model {
   })
   declare interest?: string;
 
-  @BelongsTo(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @BelongsTo(
+    () => User,
+    {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    }
+  )
   declare user: User;
 }

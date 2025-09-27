@@ -1,4 +1,4 @@
-export const HttpStatus = {
+export const Fstatus = {
   POST_SUCCESS: 201,
   GET_SUCCESS: 200,
   INTERNAL_SERVER_ERROR: 500,
