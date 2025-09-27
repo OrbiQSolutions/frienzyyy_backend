@@ -30,6 +30,7 @@
     "@nestjs/sequelize": "^11.0.0",
     "@nestjs/swagger": "^11.2.0",
     "bullmq": "^5.58.5",
+    "cloudinary": "^2.7.0",
     "mysql2": "^3.14.3",
     "nodemailer": "^6.10.1",
     "pg": "^8.16.3",
