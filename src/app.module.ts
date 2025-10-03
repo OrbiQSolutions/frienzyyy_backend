@@ -11,6 +11,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { AdminUsersModule } from './admin-users/admin.users.module';
 import { UserModule } from './user/user.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     AdminUsersModule,
     UserModule,
     CloudinaryModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],

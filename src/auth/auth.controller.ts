@@ -158,12 +158,12 @@ export class AuthController {
 
   @Post('/login-user')
   async loginUser(@Body() loginDto: LoginDto) {
-    return this.authService.loginUser(loginDto);
+    return await this.authService.loginUser(loginDto);
   }
 
   @Post('/login-user-password')
   async loginUserPassword(@Body() loginPasswordDto: LoginPasswordDto, @Req() request: Request) {
-    return this.authService.loginUserPassword(loginPasswordDto, request);
+    return await this.authService.loginUserPassword(loginPasswordDto, request);
   }
 
   @Get()
