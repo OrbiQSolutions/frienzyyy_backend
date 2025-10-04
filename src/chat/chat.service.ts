@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
+import { MessageDto } from './dto/message.dto';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class ChatService {
-  create(createChatDto: CreateChatDto) {
-    console.log(createChatDto);
+  sendMessage(messageDto: MessageDto, socket: Socket,) {
+    // const { message } = messageDto;
+    // console.log(message);
+    socket.emit("recieveMessage", 'i got the message');
     return 'This action adds a new chat';
   }
 

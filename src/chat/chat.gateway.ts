@@ -1,22 +1,37 @@
 import {
   WebSocketGateway,
   SubscribeMessage,
-  MessageBody
+  MessageBody,
+  ConnectedSocket,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  WebSocketServer
 } from '@nestjs/websockets';
 import { ChatService } from './chat.service';
-import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
+import { MessageDto } from './dto/message.dto';
+import { Socket, Server } from 'socket.io';
 
-@WebSocketGateway(6000, {})
-export class ChatGateway {
+@WebSocketGateway(6000, { cors: { origin: "*" } })
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  @WebSocketServer() server: Server;
+
   constructor(private readonly chatService: ChatService) { }
 
-  @SubscribeMessage('sendMessage')
-  create(@MessageBody() createChatDto: CreateChatDto) {
-    return this.chatService.create(createChatDto);
+  handleConnection(client: any, ...args: any[]) {
+    console.log(`The user has been connected with id: ${client.id}`);
   }
 
-  @SubscribeMessage('findAllChat')
+  handleDisconnect(client: any) {
+    console.log(`The user has been disconnected with id: ${client.id}`);
+  }
+
+  @SubscribeMessage('sendMessage')
+  sendMessage(@ConnectedSocket() socket: Socket, @MessageBody() messageDto: MessageDto) {
+    return this.chatService.sendMessage(messageDto, socket);
+  }
+
+  @SubscribeMessage('recieveMessage')
   findAll() {
     return this.chatService.findAll();
   }
