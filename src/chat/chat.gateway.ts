@@ -11,19 +11,37 @@ import { ChatService } from './chat.service';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { MessageDto } from './dto/message.dto';
 import { Socket, Server } from 'socket.io';
+import { Logger, UseGuards } from '@nestjs/common';
+import { WsGuard } from './chat.guard';
 
 @WebSocketGateway(6000, { cors: { origin: "*" } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
+  private readonly logger = new Logger(ChatGateway.name);
 
   constructor(private readonly chatService: ChatService) { }
 
-  handleConnection(client: any, ...args: any[]) {
-    console.log(`The user has been connected with id: ${client.id}`);
+  @UseGuards(WsGuard)
+  async handleConnection(@ConnectedSocket() client: Socket, ...args: any[]) {
+    this.logger.log(`HandleConnection called for client: ${JSON.stringify(client.handshake.headers[String(process.env.TOKEN_KEY)])}`);
+    const { userId } = await this.chatService.getParsedToken(String(client.handshake.headers[String(process.env.TOKEN_KEY)]));
+
+    if (userId) {
+      client.join(userId.toString());
+      console.log(`User connected with id: ${client.id}, joined room: ${userId}`);
+    } else {
+      console.log(`User connected with id: ${client.id}, but no userId found`);
+    }
   }
 
-  handleDisconnect(client: any) {
-    console.log(`The user has been disconnected with id: ${client.id}`);
+  handleDisconnect(@ConnectedSocket() client: Socket) {
+    const userId = client.handshake.auth.userId;
+    if (userId) {
+      client.leave(userId.toString()); // Highlight: Leave room on disconnect
+      console.log(`User disconnected with id: ${client.id}, left room: ${userId}`);
+    } else {
+      console.log(`User disconnected with id: ${client.id}`);
+    }
   }
 
   @SubscribeMessage('sendMessage')

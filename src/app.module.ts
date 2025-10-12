@@ -12,6 +12,9 @@ import { AdminUsersModule } from './admin-users/admin.users.module';
 import { UserModule } from './user/user.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { ChatModule } from './chat/chat.module';
+import { ProfileModule } from './profile/profile.module';
+import { Address } from './auth/entities/address.entity';
+import { ProfilePicture } from './user/entities/profile.picture.entity';
 
 @Module({
   imports: [
@@ -39,16 +42,17 @@ import { ChatModule } from './chat/chat.module';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      models: [User, UserProfile],
+      models: [User, UserProfile, Address, ProfilePicture],
       autoLoadModels: true,
       synchronize: true,
-      logging: console.log,
+      logging: false,
       // uri: process.env.DB_URL,
     }),
     AdminUsersModule,
     UserModule,
     CloudinaryModule,
     ChatModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { MessageDto } from './dto/message.dto';
 import { Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 
 @Injectable()
 export class ChatService {
+  constructor(private readonly jwtService: JwtService) { }
+
   sendMessage(messageDto: MessageDto, socket: Socket,) {
-    // const { message } = messageDto;
-    // console.log(message);
-    socket.emit("recieveMessage", 'i got the message');
-    return 'This action adds a new chat';
+    const { toUserId } = JSON.parse(String(messageDto));
+    console.log("message dto: ", messageDto);
+    console.log("message dto: ", toUserId);
+    socket.to(toUserId).emit("recieveMessage", messageDto);
+    return;
   }
 
   findAll() {
@@ -27,5 +30,20 @@ export class ChatService {
 
   remove(id: number) {
     return `This action removes a #${id} chat`;
+  }
+
+  async getParsedToken(token: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync(
+        token,
+        {
+          secret: process.env.JWT_SECRET
+        }
+      );
+      console.log(payload);
+      return payload;
+    } catch (err) {
+      return { userId: undefined };
+    }
   }
 }

@@ -60,14 +60,16 @@ export class UserProfile extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: true,
+    field: 'location'
   })
   declare location?: string;
 
   @Column({
     type: DataType.ENUM('relation', 'casual', 'not_sure', 'not_say'),
     allowNull: true,
+    field: 'dating_intent'
   })
-  declare interest?: string;
+  declare datingIntent?: string;
 
   @BelongsTo(
     () => User,
