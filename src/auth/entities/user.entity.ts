@@ -9,7 +9,7 @@ import {
   HasOne,
 } from 'sequelize-typescript';
 import { UserProfile } from './user.profile.entity';
-import { Address } from './address.entity';
+import { Address } from '../../address/entities/address.entity';
 import { ProfilePicture } from 'src/user/entities/profile.picture.entity';
 
 @Table({ tableName: 'users' })

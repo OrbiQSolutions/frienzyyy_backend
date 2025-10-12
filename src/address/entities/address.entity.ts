@@ -6,9 +6,9 @@ import {
   Model,
   Table
 } from "sequelize-typescript";
-import { User } from "./user.entity";
+import { User } from "../../auth/entities/user.entity";
 
-@Table({ tableName: "address" })
+@Table({ tableName: "user_address" })
 export class Address extends Model {
   @ForeignKey(() => User)
   @Column({
@@ -17,6 +17,20 @@ export class Address extends Model {
     allowNull: true
   })
   declare userId: string;
+
+  @Column({
+    type: DataType.STRING,
+    field: 'city_name',
+    allowNull: true
+  })
+  declare cityName: string;
+
+  @Column({
+    type: DataType.STRING,
+    field: 'country_name',
+    allowNull: true
+  })
+  declare countryName: string;
 
   @Column({
     type: DataType.STRING,

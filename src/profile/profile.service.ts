@@ -6,7 +6,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/auth/entities/user.entity';
 import responseBody from 'src/core/commonfunctions/response.body';
 import { UserProfile } from 'src/auth/entities/user.profile.entity';
-import { Address } from 'src/auth/entities/address.entity';
+import { Address } from 'src/address/entities/address.entity';
 
 @Injectable()
 export class ProfileService {

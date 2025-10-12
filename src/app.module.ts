@@ -13,8 +13,9 @@ import { UserModule } from './user/user.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { ChatModule } from './chat/chat.module';
 import { ProfileModule } from './profile/profile.module';
-import { Address } from './auth/entities/address.entity';
+import { Address } from './address/entities/address.entity';
 import { ProfilePicture } from './user/entities/profile.picture.entity';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { ProfilePicture } from './user/entities/profile.picture.entity';
     CloudinaryModule,
     ChatModule,
     ProfileModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],

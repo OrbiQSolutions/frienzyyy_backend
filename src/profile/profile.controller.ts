@@ -18,7 +18,7 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) { }
 
   @UseGuards(AuthGuard)
-  @Post('/get-matched-profiles')
+  @Post('/get-profiles')
   async getMatchedProfiles() {
     return await this.profileService.getMatchedProfiles();
   }

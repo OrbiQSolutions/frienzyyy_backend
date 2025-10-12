@@ -29,16 +29,16 @@ import { LoginPasswordDto } from './dto/login.password.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private jwtService: JwtService,
+    private readonly jwtService: JwtService,
 
     @InjectModel(User)
-    private userModel: typeof User,
+    private readonly userModel: typeof User,
 
     @InjectModel(UserProfile)
-    private userProfileModel: typeof UserProfile,
+    private readonly userProfileModel: typeof UserProfile,
 
     @InjectModel(AuthLog)
-    private authLogModel: typeof AuthLog,
+    private readonly authLogModel: typeof AuthLog,
 
     @InjectQueue("emails")
     private readonly emailQueue: Queue,
