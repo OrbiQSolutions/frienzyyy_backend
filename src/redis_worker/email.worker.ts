@@ -8,9 +8,14 @@ export class EmailWorker extends WorkerHost {
   private readonly logger = new Logger(EmailWorker.name);
 
   async process(job: Job): Promise<any> {
-    sendEmail(job.data.to, job.data.subject, job.data.text, job.data.html);
-    this.logger.log(`Mail sent to ${job.data.to} for user sign up`);
-    return;
+    try {
+      sendEmail(job.data.to, job.data.subject, job.data.text, job.data.html);
+      this.logger.log(`Mail sent to ${job.data.to} for user sign up`);
+      return;
+    } catch (err) {
+      this.logger.error("The error occurred while sendin email");
+      return;
+    }
   }
 
   @OnWorkerEvent("completed")

@@ -9,6 +9,8 @@ import {
   HasOne,
 } from 'sequelize-typescript';
 import { UserProfile } from './user.profile.entity';
+import { Address } from '../../address/entities/address.entity';
+import { ProfilePicture } from 'src/user/entities/profile.picture.entity';
 
 @Table({ tableName: 'users' })
 export class User extends Model {
@@ -65,4 +67,10 @@ export class User extends Model {
 
   @HasOne(() => UserProfile)
   declare profile: UserProfile;
+
+  @HasOne(() => Address)
+  declare address: Address;
+
+  @HasOne(() => ProfilePicture)
+  declare profilePicture: ProfilePicture;
 }

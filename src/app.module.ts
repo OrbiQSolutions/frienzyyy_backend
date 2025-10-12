@@ -9,6 +9,13 @@ import { UserProfile } from './auth/entities/user.profile.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { BullModule } from '@nestjs/bullmq';
 import { AdminUsersModule } from './admin-users/admin.users.module';
+import { UserModule } from './user/user.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { ChatModule } from './chat/chat.module';
+import { ProfileModule } from './profile/profile.module';
+import { Address } from './address/entities/address.entity';
+import { ProfilePicture } from './user/entities/profile.picture.entity';
+import { AddressModule } from './address/address.module';
 
 @Module({
   imports: [
@@ -31,18 +38,23 @@ import { AdminUsersModule } from './admin-users/admin.users.module';
     }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
-      // host: process.env.DB_HOST,
-      // port: Number(process.env.DB_PORT),
-      // username: process.env.DB_USERNAME,
-      // password: process.env.DB_PASSWORD,
-      // database: process.env.DB_DATABASE,
-      models: [User, UserProfile],
+      host: process.env.DB_HOST,
+      port: Number(process.env.DB_PORT),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      models: [User, UserProfile, Address, ProfilePicture],
       autoLoadModels: true,
       synchronize: true,
       logging: false,
       uri: process.env.DB_URL,
     }),
     AdminUsersModule,
+    UserModule,
+    CloudinaryModule,
+    ChatModule,
+    ProfileModule,
+    AddressModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -7,10 +7,18 @@ import { UserProfile } from './entities/user.profile.entity';
 import { BullModule } from '@nestjs/bullmq';
 import { EmailWorker } from 'src/redis_worker/email.worker';
 import { AuthLog } from './entities/auth.log.entity';
+import { ProfilePicture } from '../user/entities/profile.picture.entity';
+import { Address } from '../address/entities/address.entity';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([User, UserProfile, AuthLog]),
+    SequelizeModule.forFeature([
+      User,
+      UserProfile,
+      AuthLog,
+      ProfilePicture,
+      Address
+    ]),
     BullModule.registerQueue(
       {
         name: "emails",

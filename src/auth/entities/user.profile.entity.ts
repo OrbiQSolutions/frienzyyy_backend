@@ -52,13 +52,6 @@ export class UserProfile extends Model {
   declare dateOfBirth?: Date;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: true,
-    field: 'profile_picture'
-  })
-  declare profilePicture?: string;
-
-  @Column({
     type: DataType.TEXT,
     allowNull: true,
   })
@@ -67,15 +60,23 @@ export class UserProfile extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: true,
+    field: 'location'
   })
   declare location?: string;
 
   @Column({
     type: DataType.ENUM('relation', 'casual', 'not_sure', 'not_say'),
     allowNull: true,
+    field: 'dating_intent'
   })
-  declare interest?: string;
+  declare datingIntent?: string;
 
-  @BelongsTo(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @BelongsTo(
+    () => User,
+    {
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+    }
+  )
   declare user: User;
 }
