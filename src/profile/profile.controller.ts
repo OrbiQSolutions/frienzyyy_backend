@@ -12,6 +12,7 @@ import {
 import { ProfileService } from './profile.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { SwipeDto } from './dto/swipe.dto';
 
 @Controller('profile')
 export class ProfileController {
@@ -21,6 +22,12 @@ export class ProfileController {
   @Post('/get-profiles')
   async getMatchedProfiles() {
     return await this.profileService.getMatchedProfiles();
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/swipe')
+  async swipe(swipeDto: SwipeDto, @Req() request: Request) {
+    return this.profileService.swipe(swipeDto, request);
   }
 
   @Get()

@@ -1,10 +1,16 @@
-import { Column, DataType, ForeignKey, Table } from "sequelize-typescript";
+import {
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table
+} from "sequelize-typescript";
 import { User } from "src/auth/entities/user.entity";
 
 @Table({
   tableName: "chat_messages"
 })
-export class ChatMessages {
+export class ChatMessages extends Model {
   @ForeignKey(() => User)
   @Column({
     type: DataType.UUID,
@@ -22,13 +28,13 @@ export class ChatMessages {
   declare toUser: string;
 
   @Column({
-    field: "message",
+    field: "text_message",
     type: DataType.STRING,
     allowNull: true
   })
-  declare userMessage: string;
+  declare textMessage: string;
 
-    @Column({
+  @Column({
     field: "image_url",
     type: DataType.STRING,
     allowNull: true

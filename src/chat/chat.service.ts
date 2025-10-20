@@ -3,15 +3,25 @@ import { UpdateChatDto } from './dto/update-chat.dto';
 import { MessageDto } from './dto/message.dto';
 import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
+import { InjectModel } from '@nestjs/sequelize';
+import { ChatMessages } from './entities/chat.entity';
 
 @Injectable()
 export class ChatService {
-  constructor(private readonly jwtService: JwtService) { }
+  constructor(
+    private readonly jwtService: JwtService,
 
-  sendMessage(messageDto: MessageDto, socket: Socket,) {
-    const { toUserId } = JSON.parse(String(messageDto));
-    console.log("message dto: ", messageDto);
-    console.log("message dto: ", toUserId);
+    @InjectModel(ChatMessages)
+    private readonly chatMessagesModel: typeof ChatMessages,
+  ) { }
+
+  async sendMessage(messageDto: MessageDto, socket: Socket,) {
+    const { toUserId, fromUserId, message } = messageDto;
+    const savedChat = await this.chatMessagesModel.create({
+      fromUser: fromUserId,
+      toUser: toUserId,
+      textMessage: message
+    });
     socket.to(toUserId).emit("recieveMessage", messageDto);
     return;
   }
