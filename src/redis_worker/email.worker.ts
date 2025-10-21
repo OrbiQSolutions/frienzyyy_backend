@@ -9,7 +9,7 @@ export class EmailWorker extends WorkerHost {
 
   async process(job: Job): Promise<any> {
     try {
-      sendEmail(job.data.to, job.data.subject, job.data.text, job.data.html);
+      await sendEmail(job.data.to, job.data.subject, job.data.text, job.data.html);
       this.logger.log(`Mail sent to ${job.data.to} for user sign up`);
       return;
     } catch (err) {

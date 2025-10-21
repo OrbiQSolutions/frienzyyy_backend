@@ -33,7 +33,6 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post("/validate-token")
   async validateToken(@Req() req: Request, @Res() res: Response) {
-    console.log("reached validating");
 
     const response = await this.authService.validateToken(req);
     if (response instanceof UnauthorizedException) {

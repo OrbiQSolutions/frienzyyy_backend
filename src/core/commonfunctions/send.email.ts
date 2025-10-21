@@ -1,10 +1,14 @@
 import * as nodemailer from 'nodemailer';
 
-export function sendEmail(to: string, subject: string, text: string, html?: String) {
+export async function sendEmail(to: string, subject: string, text: string, html?: String) {
+  console.log(process.env.EMAIL_USERNAME);
+  console.log(process.env.EMAIL_PASSWORD);
+  console.log(process.env.EMAIL_HOST);
+  console.log(process.env.EMAIL_PORT);
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: Number(process.env.EMAIL_PORT),
-    secure: false, // true for 465, false for other ports
+    secure: false,
     auth
       : {
       user: process.env.EMAIL_USERNAME,

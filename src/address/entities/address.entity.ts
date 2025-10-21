@@ -4,6 +4,7 @@ import {
   DataType,
   ForeignKey,
   Model,
+  PrimaryKey,
   Table
 } from "sequelize-typescript";
 import { User } from "../../auth/entities/user.entity";
@@ -11,9 +12,11 @@ import { User } from "../../auth/entities/user.entity";
 @Table({ tableName: "user_address" })
 export class Address extends Model {
   @ForeignKey(() => User)
+  @PrimaryKey
   @Column({
     type: DataType.UUID,
     field: 'user_id',
+    unique: true,
     allowNull: true
   })
   declare userId: string;

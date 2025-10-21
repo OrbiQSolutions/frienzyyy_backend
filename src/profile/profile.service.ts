@@ -16,17 +16,38 @@ export class ProfileService {
     @InjectModel(User)
     private readonly userModel: typeof User,
 
+    @InjectModel(UserProfile)
+    private readonly userProfileModel: typeof UserProfile,
+
     @InjectModel(MatchProfile)
     private readonly matchProfileModel: typeof MatchProfile,
   ) { }
 
-  async getMatchedProfiles() {
+  async getMatchedProfiles(request: Request) {
+    const { userId } = request['user'];
+    const userProfile = await this.userProfileModel.findOne({
+      where: {
+        userId
+      }
+    });
+    let requiredGender = "other";
+
+    if (userProfile && userProfile.gender == 'male') {
+      requiredGender = 'female'
+    } else if (userProfile && userProfile.gender == 'female') {
+      requiredGender = 'male';
+    }
+
     const matchedProfiles = await this.userModel.findAll({
       attributes: {
         exclude: ['otp']
       },
       include: [
-        { model: UserProfile, as: 'profile', required: false },
+        {
+          model: UserProfile, as: 'profile', required: true, where: {
+            gender: requiredGender
+          }
+        },
         { model: Address, as: 'address', required: false }
       ]
     });
@@ -58,7 +79,7 @@ export class ProfileService {
         return responseBody(201, "Right swiped");
       }
 
-      
+
 
       return responseBody(201, "It's a match");
     } catch (err) {

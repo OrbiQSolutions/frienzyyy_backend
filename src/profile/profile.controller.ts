@@ -20,8 +20,8 @@ export class ProfileController {
 
   @UseGuards(AuthGuard)
   @Post('/get-profiles')
-  async getMatchedProfiles() {
-    return await this.profileService.getMatchedProfiles();
+  async getMatchedProfiles(@Req() request: Request) {
+    return await this.profileService.getMatchedProfiles(request);
   }
 
   @UseGuards(AuthGuard)
