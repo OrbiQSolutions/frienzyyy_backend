@@ -25,9 +25,12 @@ import { CreateWithEmailLookingFor } from './dto/create.with.email.lookingfor.dt
 import { AuthLog } from './entities/auth.log.entity';
 import { LoginDto } from './dto/login.dto';
 import { LoginPasswordDto } from './dto/login.password.dto';
+import { BioDto } from './dto/bio.sto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly jwtService: JwtService,
 
@@ -43,8 +46,6 @@ export class AuthService {
     @InjectQueue("emails")
     private readonly emailQueue: Queue,
   ) { }
-
-  private readonly logger = new Logger(AuthService.name);
 
   private async getToken(email: string, userId: string, deviceName?: string): Promise<string> {
     const token = this.jwtService.sign({ email, userId });
@@ -434,6 +435,30 @@ export class AuthService {
     const { password, ...userWithoutPassword } = user.get({ plain: true });
 
     return userWithoutPassword;
+  }
+
+  async updateBioWhileOnboard(bioDto: BioDto, request: Request) {
+    const { userId } = request["user"];
+    const { bio } = bioDto;
+    try {
+      const existingUser = await this.userModel.findOne({ where: { userId } });
+
+      if (!existingUser) {
+        throw new BadRequestException(message.USER_DOESNT_EXIST);
+      }
+
+      const bioUpdated = await this.userProfileModel.update({
+        bio
+      }, {
+        where: {
+          userId
+        }
+      });
+
+      return responseBody(201, "Updated Successfully", bioUpdated);
+    } catch (err) {
+
+    }
   }
 
   remove(id: number) {

@@ -25,6 +25,7 @@ import { CreateWithEmailGender } from './dto/create.with.email.gender.dto';
 import { CreateWithEmailLookingFor } from './dto/create.with.email.lookingfor.dto';
 import { LoginDto } from './dto/login.dto';
 import { LoginPasswordDto } from './dto/login.password.dto';
+import { BioDto } from './dto/bio.sto';
 
 @Controller('auth')
 export class AuthController {
@@ -163,6 +164,12 @@ export class AuthController {
   @Post('/login-user-password')
   async loginUserPassword(@Body() loginPasswordDto: LoginPasswordDto, @Req() request: Request) {
     return await this.authService.loginUserPassword(loginPasswordDto, request);
+  }
+
+  @UseGuards(AuthGuard)
+  @Put('/update-bio')
+  async updateBioWhileOnboard(@Body() bioDto: BioDto, @Req() request: Request) {
+    return await this.authService.updateBioWhileOnboard(bioDto, request);
   }
 
   @Get()

@@ -6,14 +6,12 @@ import {
   Default,
   ForeignKey,
   BelongsTo,
-  PrimaryKey
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 
 @Table({ tableName: 'users_profile' })
 export class UserProfile extends Model {
   @ForeignKey(() => User)
-  @PrimaryKey
   @Column({
     type: DataType.UUID,
     allowNull: false,
