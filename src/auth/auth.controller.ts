@@ -188,7 +188,7 @@ export class AuthController {
   }
 
   @Delete(':id')
-  removeById(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  async deleteUser(@Param('id') id: string) {
+    return await this.authService.deleteUser(id);
   }
 }

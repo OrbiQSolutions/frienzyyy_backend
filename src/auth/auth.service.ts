@@ -461,7 +461,12 @@ export class AuthService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async deleteUser(id: string) {
+    const user = await this.userModel.findByPk(id);
+    if (!user) {
+      return responseBody(404, 'User not found', null);
+    }
+    await user.destroy();
+    return responseBody(200, 'User deleted successfully', user);
   }
 }
