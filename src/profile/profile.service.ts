@@ -1,5 +1,7 @@
 import {
   Injectable,
+  Logger,
+  NotFoundException
 } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -9,24 +11,64 @@ import { UserProfile } from 'src/auth/entities/user.profile.entity';
 import { Address } from 'src/address/entities/address.entity';
 import { SwipeDto } from './dto/swipe.dto';
 import { MatchProfile } from './entities/match.profile.entity';
+import { Interests } from './entities/interests.entity';
+import { AddInterestsDto } from './dto/add.interests.dto';
+import { UserInterests } from 'src/auth/entities/user.interests.entity';
+import { Op } from 'sequelize';
+import { ChatList } from 'src/chat/entities/chat.list.entity';
 
 @Injectable()
 export class ProfileService {
+  private readonly logger = new Logger(ProfileService.name);
+
   constructor(
     @InjectModel(User)
     private readonly userModel: typeof User,
 
+    @InjectModel(Interests)
+    private readonly interestsModel: typeof Interests,
+
+    @InjectModel(UserProfile)
+    private readonly userProfileModel: typeof UserProfile,
+
     @InjectModel(MatchProfile)
     private readonly matchProfileModel: typeof MatchProfile,
+
+    @InjectModel(UserInterests)
+    private readonly userInterestModel: typeof UserInterests,
+
+    @InjectModel(ChatList)
+    private readonly chatList: typeof ChatList
   ) { }
 
-  async getMatchedProfiles() {
+  async getMatchedProfiles(request: Request) {
+    const { userId } = request['user'];
+    const userProfile = await this.userProfileModel.findOne({
+      where: {
+        userId
+      }
+    });
+    let requiredGender = "other";
+
+    if (userProfile && userProfile.gender == 'male') {
+      requiredGender = 'female'
+    } else if (userProfile && userProfile.gender == 'female') {
+      requiredGender = 'male';
+    }
+
     const matchedProfiles = await this.userModel.findAll({
+      where: {
+        userId: { [Op.ne]: userId }
+      },
       attributes: {
         exclude: ['otp']
       },
       include: [
-        { model: UserProfile, as: 'profile', required: false },
+        {
+          model: UserProfile, as: 'profile', required: true, where: {
+            gender: requiredGender
+          }
+        },
         { model: Address, as: 'address', required: false }
       ]
     });
@@ -34,6 +76,7 @@ export class ProfileService {
   }
 
   async swipe(swipeDto: SwipeDto, request: Request) {
+    console.log(swipeDto);
     const { userId } = request['user'];
     const { profileUserId, status } = swipeDto;
     try {
@@ -44,7 +87,7 @@ export class ProfileService {
       });
 
       if (status == 0) {
-        return responseBody(201, "Left swiped");
+        return responseBody(201, "Left swiped", { isMatched: false });
       }
 
       const userASwiped = await this.matchProfileModel.findOne({
@@ -55,23 +98,70 @@ export class ProfileService {
       });
 
       if (!userASwiped) {
-        return responseBody(201, "Right swiped");
+        return responseBody(201, "Right swiped", { isMatched: false });
       }
 
-      
+      const chatList = await this.chatList.create({
+        userId: userId,
+        chatUserId: profileUserId
+      });
 
-      return responseBody(201, "It's a match");
+      return responseBody(201, "It's a match", { isMatched: true });
     } catch (err) {
 
     }
   }
 
-  findAll() {
-    return `This action returns all profile`;
+  async getAllInterests() {
+    return await this.interestsModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} profile`;
+  async addInterests(addInterestsDto: AddInterestsDto, userId: string) {
+    const { interestsList } = addInterestsDto;
+    this.logger.log(interestsList);
+    if (!interestsList) return responseBody(201, "The list is empty");
+    for (let i = 0; i < interestsList.length; ++i) {
+      const interestId = interestsList[i];
+      await this.userInterestModel.create({ userId, interestId })
+    }
+
+    return responseBody(201, "All the interests are added");
+  }
+
+  async findUser(id: string) {
+    const user = await this.userModel.findOne({
+      where: { userId: id },
+      attributes: {
+        exclude: ['password', 'otp']
+      },
+      include: [
+        { model: UserProfile, as: 'profile', required: false },
+        { model: Address, as: 'address', required: false },
+        { model: Interests, as: 'interests', required: false, attributes: { exclude: ['UserInterests', 'updatedAt', 'createdAt'] } }
+      ]
+    });
+
+    if (!user) throw new NotFoundException;
+
+    return responseBody(200, "The user successfully found", user);
+  }
+
+  async getAllSwipedProfiles(userId: string) {
+    const allSwipedProfiles = await this.matchProfileModel.findAll({
+      where: {
+        userAId: userId
+      },
+      include: [{
+        model: User,
+        as: 'userB',
+        required: false,
+        attributes: {
+          exclude: ['otp', 'resetPasswordToken', 'resetPasswordExpires', 'password']
+        }
+      }]
+    });
+
+    return responseBody(201, "All the fetched profiles have been fetched", allSwipedProfiles);
   }
 
   update(id: number, updateProfileDto: UpdateProfileDto) {

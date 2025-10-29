@@ -7,10 +7,15 @@ import {
   Default,
   Unique,
   HasOne,
+  BelongsToMany,
+  HasMany,
 } from 'sequelize-typescript';
 import { UserProfile } from './user.profile.entity';
 import { Address } from '../../address/entities/address.entity';
 import { ProfilePicture } from 'src/user/entities/profile.picture.entity';
+import { Interests } from 'src/profile/entities/interests.entity';
+import { UserInterests } from './user.interests.entity';
+import { MatchProfile } from 'src/profile/entities/match.profile.entity';
 
 @Table({ tableName: 'users' })
 export class User extends Model {
@@ -73,4 +78,7 @@ export class User extends Model {
 
   @HasOne(() => ProfilePicture)
   declare profilePicture: ProfilePicture;
+
+  @BelongsToMany(() => Interests, () => UserInterests)
+  declare interests: Interests[];
 }

@@ -1,0 +1,592 @@
+{
+	"info": {
+		"_postman_id": "b17f9bf0-cea2-4891-8a91-1f495f3d2704",
+		"name": "frienzyyy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "18302498"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\":\"Abhishek\",\r\n    \"lastName\":\"Kayal\",\r\n    \"email\":\"abhi@gmail.com\",\r\n    \"password\":\"123456\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/signup"
+					},
+					"response": []
+				},
+				{
+					"name": "get all user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseUrl}}/v1/api/auth"
+					},
+					"response": []
+				},
+				{
+					"name": "get user by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/v1/api/auth/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"auth",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "05bbd40f-cf84-44b6-a5e8-2adab219adba"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user by id",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Abhi\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/v1/api/auth/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"v1",
+								"api",
+								"auth",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "05bbd40f-cf84-44b6-a5e8-2adab219adba"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "otp verification",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"abhishek491981@gmail.com\",\r\n    \"otp\": \"3549\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/signup-with-email-verify"
+					},
+					"response": []
+				},
+				{
+					"name": "signup with email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"cocopowder1155@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/signup-with-email"
+					},
+					"response": []
+				},
+				{
+					"name": "signup with email password set",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRyYWtvY29kZWZvcmV2ZXJAZ21haWwuY29tIiwidXNlcklkIjoiNDVlNmNjZjItY2YxNC00M2EwLWEyMzUtZjg5NDQyM2FhODE1IiwiaWF0IjoxNzU4MDQwNTc5LCJleHAiOjE3NTg2NDUzNzl9.3Wweo4LCcmxI_gW_Ls8ncmk70134BQP-9YjgkeQekq4",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    // \"email\": \"abhishek4919811@gmail.com\",\r\n    \"password\": \"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/signup-with-email-password"
+					},
+					"response": []
+				},
+				{
+					"name": "signup with email name set",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Sakura Haruno\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/signup-with-email-name"
+					},
+					"response": []
+				},
+				{
+					"name": "signup with email date of birth set",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"abhi2@gmail.com\",\r\n    \"dob\": \"2002-08-22\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/signup-with-email-date-of-birth"
+					},
+					"response": []
+				},
+				{
+					"name": "validate token",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/api/auth/validate-token"
+					},
+					"response": []
+				},
+				{
+					"name": "is user found",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"lala@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/login-user"
+					},
+					"response": []
+				},
+				{
+					"name": "login user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"lala@gmail.com\",\r\n    \"password\": \"1092\"\r\n}\r\n// {\r\n//     \"email\": \"b@b.com\",\r\n//     \"password\": \"123456\"\r\n// }\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/login-user-password"
+					},
+					"response": []
+				},
+				{
+					"name": "update gender",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"gender\": \"female\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/signup-with-email-gender"
+					},
+					"response": []
+				},
+				{
+					"name": "update bio",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"bio\": \"Traveller here who want to explore the world with someone who does not going to heaven\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/update-bio"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "users",
+					"item": [
+						{
+							"name": "get all users",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"abhi8@gmail.com\"\r\n}"
+								},
+								"url": "{{baseUrl}}/v1/api/admin/users/get-all-users"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "interests",
+					"item": [
+						{
+							"name": "create interests",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{tokenKey}}",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"interestName\": \"Art\",\r\n    \"imageUrl\": \"https://e7.pngegg.com/pngimages/804/977/png-clipart-computer-icons-artist-painting-painting-painting-area.png\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/api/admin/interests"
+							},
+							"response": []
+						},
+						{
+							"name": "find all interests",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "{{baseUrl}}/v1/api/admin/interests"
+							},
+							"response": []
+						},
+						{
+							"name": "udpate interest",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"interestName\": \"Art\"\r\n    // \"imageUrl\": \"new\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/api/admin/interests/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"api",
+										"admin",
+										"interests",
+										":id"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "5b0e8191-0624-4b8f-85fb-255e7e43f212",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "5b0e8191-0624-4b8f-85fb-255e7e43f212"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "upload profile picture",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1eef64a9-65db-4340-9181-ededd88c8fa7"
+								}
+							]
+						},
+						"url": "{{baseUrl}}/v1/api/user/upload-profile-picture"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "profile",
+			"item": [
+				{
+					"name": "get matched profiles",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/api/profile/get-profiles"
+					},
+					"response": []
+				},
+				{
+					"name": "swiped",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"profileUserId\": \"3c184b5b-cac2-4f24-a03d-51116cff56dd\",\r\n    // \"status\": 0 // left swipe\r\n    \"status\": 1 // right swipe\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/profile/swipe"
+					},
+					"response": []
+				},
+				{
+					"name": "add interests",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"interestsList\": [\r\n        \"5b0e8191-0624-4b8f-85fb-255e7e43f212\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/profile/add-interests"
+					},
+					"response": []
+				},
+				{
+					"name": "find user",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/api/profile/3c184b5b-cac2-4f24-a03d-51116cff56dd"
+					},
+					"response": []
+				},
+				{
+					"name": "get all swiped profiles",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/api/profile/get-all-swiped-profiles"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "address",
+			"item": [
+				{
+					"name": "add new address",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"pincode\": \"110004\",\r\n    \"countryName\": \"India\",\r\n    \"cityName\": \"Noida\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/address/add-address"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "test",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{baseUrl}}"
+			},
+			"response": []
+		},
+		{
+			"name": "swagger doc",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{baseUrl}}/api/docs"
+			},
+			"response": []
+		}
+	]
+}

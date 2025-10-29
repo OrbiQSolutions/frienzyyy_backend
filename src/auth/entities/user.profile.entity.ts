@@ -5,23 +5,12 @@ import {
   DataType,
   Default,
   ForeignKey,
-  BelongsTo
+  BelongsTo,
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 
 @Table({ tableName: 'users_profile' })
 export class UserProfile extends Model {
-  // @Column({
-  //   type: DataType.STRING,
-  //   allowNull: false,
-  // })
-  // firstName: string;
-
-  // @Column({
-  //   type: DataType.STRING,
-  // })
-  // lastName?: string;
-
   @ForeignKey(() => User)
   @Column({
     type: DataType.UUID,

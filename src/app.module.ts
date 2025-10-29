@@ -16,6 +16,9 @@ import { ProfileModule } from './profile/profile.module';
 import { Address } from './address/entities/address.entity';
 import { ProfilePicture } from './user/entities/profile.picture.entity';
 import { AddressModule } from './address/address.module';
+import { AdminInterestsModule } from './admin-interests/admin-interests.module';
+import { UserInterests } from './auth/entities/user.interests.entity';
+import { Interests } from './profile/entities/interests.entity';
 
 @Module({
   imports: [
@@ -43,7 +46,7 @@ import { AddressModule } from './address/address.module';
       // username: process.env.DB_USERNAME,
       // password: process.env.DB_PASSWORD,
       // database: process.env.DB_DATABASE,
-      models: [User, UserProfile, Address, ProfilePicture],
+      models: [User, UserProfile, Address, ProfilePicture, UserInterests, Interests],
       autoLoadModels: true,
       synchronize: true,
       logging: false,
@@ -55,6 +58,7 @@ import { AddressModule } from './address/address.module';
     ChatModule,
     ProfileModule,
     AddressModule,
+    AdminInterestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

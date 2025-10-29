@@ -14,7 +14,7 @@ import { Socket, Server } from 'socket.io';
 import { Logger, UseGuards } from '@nestjs/common';
 import { WsGuard } from './chat.guard';
 
-@WebSocketGateway(6000, { cors: { origin: "*" } })
+@WebSocketGateway({ cors: { origin: "*" } })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   private readonly logger = new Logger(ChatGateway.name);

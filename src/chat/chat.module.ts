@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { ChatGateway } from './chat.gateway';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { ChatMessages } from './entities/chat.entity';
+import { ChatMessages } from './entities/chat.message.entity';
 
 @Module({
   imports: [

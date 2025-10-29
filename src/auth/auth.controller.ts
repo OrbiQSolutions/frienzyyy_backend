@@ -25,6 +25,7 @@ import { CreateWithEmailGender } from './dto/create.with.email.gender.dto';
 import { CreateWithEmailLookingFor } from './dto/create.with.email.lookingfor.dto';
 import { LoginDto } from './dto/login.dto';
 import { LoginPasswordDto } from './dto/login.password.dto';
+import { BioDto } from './dto/bio.sto';
 
 @Controller('auth')
 export class AuthController {
@@ -33,7 +34,6 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post("/validate-token")
   async validateToken(@Req() req: Request, @Res() res: Response) {
-    console.log("reached validating");
 
     const response = await this.authService.validateToken(req);
     if (response instanceof UnauthorizedException) {
@@ -166,6 +166,12 @@ export class AuthController {
     return await this.authService.loginUserPassword(loginPasswordDto, request);
   }
 
+  @UseGuards(AuthGuard)
+  @Put('/update-bio')
+  async updateBioWhileOnboard(@Body() bioDto: BioDto, @Req() request: Request) {
+    return await this.authService.updateBioWhileOnboard(bioDto, request);
+  }
+
   @Get()
   findAll() {
     return this.authService.findAll();
@@ -182,7 +188,7 @@ export class AuthController {
   }
 
   @Delete(':id')
-  removeById(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  async deleteUser(@Param('id') id: string) {
+    return await this.authService.deleteUser(id);
   }
 }

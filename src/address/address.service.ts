@@ -12,11 +12,11 @@ export class AddressService {
   ) { }
 
   async create(createAddressDto: CreateAddressDto, req: Request) {
-    const {userId} = req['user'];
+    const { userId } = req['user'];
     const newAddress = await this.addressModel.create({
       userId,
       ...createAddressDto
-    })
+    });
     return newAddress;
   }
 
