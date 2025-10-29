@@ -44,6 +44,13 @@ export class ProfileController {
     return await this.profileService.addInterests(addInterestsDto, userId);
   }
 
+  @UseGuards(AuthGuard)
+  @Post('/get-all-swiped-profiles')
+  async getAllSwipedProfiles(@Req() request: Request) {
+    const { userId } = request['user'];
+    return await this.profileService.getAllSwipedProfiles(userId);
+  }
+
   @Get(':userId')
   async findUser(@Param('userId') userId: string) {
     return await this.profileService.findUser(userId);

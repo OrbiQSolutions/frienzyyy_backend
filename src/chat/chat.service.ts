@@ -4,7 +4,7 @@ import { MessageDto } from './dto/message.dto';
 import { Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import { InjectModel } from '@nestjs/sequelize';
-import { ChatMessages } from './entities/chat.entity';
+import { ChatMessages } from './entities/chat.message.entity';
 
 @Injectable()
 export class ChatService {

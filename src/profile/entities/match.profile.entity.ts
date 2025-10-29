@@ -3,7 +3,8 @@ import {
   DataType,
   ForeignKey,
   Table,
-  Model
+  Model,
+  BelongsTo
 } from "sequelize-typescript";
 import { User } from "src/auth/entities/user.entity";
 
@@ -20,6 +21,9 @@ export class MatchProfile extends Model {
   })
   declare userAId: string;
 
+  @BelongsTo(() => User, { foreignKey: 'userAId', targetKey: 'userId', as: 'userA' })
+  declare userA: User;
+
   @ForeignKey(() => User)
   @Column({
     field: "user_b",
@@ -28,6 +32,9 @@ export class MatchProfile extends Model {
     allowNull: false
   })
   declare userBId: string;
+
+  @BelongsTo(() => User, { foreignKey: 'userBId', targetKey: 'userId', as: 'userB' })
+  declare userB: User;
 
   @Column({
     field: "status",

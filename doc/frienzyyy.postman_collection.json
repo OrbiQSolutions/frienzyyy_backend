@@ -245,7 +245,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "// {\r\n//     \"email\": \"lala@gmail.com\",\r\n//     \"password\": \"1092\"\r\n// }\r\n{\r\n    \"email\": \"abhishek4919811@gmail.com\",\r\n    \"password\": \"abcd\"\r\n}\r\n",
+							"raw": "{\r\n    \"email\": \"lala@gmail.com\",\r\n    \"password\": \"1092\"\r\n}\r\n// {\r\n//     \"email\": \"b@b.com\",\r\n//     \"password\": \"123456\"\r\n// }\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -279,6 +279,30 @@
 						"url": "{{baseUrl}}/v1/api/auth/signup-with-email-gender"
 					},
 					"response": []
+				},
+				{
+					"name": "update bio",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"bio\": \"Traveller here who want to explore the world with someone who does not going to heaven\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/auth/update-bio"
+					},
+					"response": []
 				}
 			]
 		},
@@ -301,6 +325,87 @@
 									"raw": "{\r\n    \"email\": \"abhi8@gmail.com\"\r\n}"
 								},
 								"url": "{{baseUrl}}/v1/api/admin/users/get-all-users"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "interests",
+					"item": [
+						{
+							"name": "create interests",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "{{tokenKey}}",
+										"value": "Bearer {{token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"interestName\": \"Art\",\r\n    \"imageUrl\": \"https://e7.pngegg.com/pngimages/804/977/png-clipart-computer-icons-artist-painting-painting-painting-area.png\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{baseUrl}}/v1/api/admin/interests"
+							},
+							"response": []
+						},
+						{
+							"name": "find all interests",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "{{baseUrl}}/v1/api/admin/interests"
+							},
+							"response": []
+						},
+						{
+							"name": "udpate interest",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"interestName\": \"Art\"\r\n    // \"imageUrl\": \"new\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/v1/api/admin/interests/:id",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"v1",
+										"api",
+										"admin",
+										"interests",
+										":id"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "5b0e8191-0624-4b8f-85fb-255e7e43f212",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "5b0e8191-0624-4b8f-85fb-255e7e43f212"
+										}
+									]
+								}
 							},
 							"response": []
 						}
@@ -357,7 +462,7 @@
 					"response": []
 				},
 				{
-					"name": "right swiped",
+					"name": "swiped",
 					"request": {
 						"method": "POST",
 						"header": [
@@ -369,7 +474,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"profileUserId\": \"bgmi.gift.official@gmail.com\",\r\n    // \"status\": 0 // left swipe\r\n    \"status\": 1 // right swipe\r\n}",
+							"raw": "{\r\n    \"profileUserId\": \"3c184b5b-cac2-4f24-a03d-51116cff56dd\",\r\n    // \"status\": 0 // left swipe\r\n    \"status\": 1 // right swipe\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -377,6 +482,60 @@
 							}
 						},
 						"url": "{{baseUrl}}/v1/api/profile/swipe"
+					},
+					"response": []
+				},
+				{
+					"name": "add interests",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"interestsList\": [\r\n        \"5b0e8191-0624-4b8f-85fb-255e7e43f212\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{baseUrl}}/v1/api/profile/add-interests"
+					},
+					"response": []
+				},
+				{
+					"name": "find user",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/api/profile/3c184b5b-cac2-4f24-a03d-51116cff56dd"
+					},
+					"response": []
+				},
+				{
+					"name": "get all swiped profiles",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{tokenKey}}",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": "{{baseUrl}}/v1/api/profile/get-all-swiped-profiles"
 					},
 					"response": []
 				}
@@ -398,7 +557,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"pincode\": \"110003\",\r\n    \"countryName\": \"India\",\r\n    \"cityName\": \"Delhi\"\r\n}",
+							"raw": "{\r\n    \"pincode\": \"110004\",\r\n    \"countryName\": \"India\",\r\n    \"cityName\": \"Noida\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -417,6 +576,15 @@
 				"method": "GET",
 				"header": [],
 				"url": "{{baseUrl}}"
+			},
+			"response": []
+		},
+		{
+			"name": "swagger doc",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "{{baseUrl}}/api/docs"
 			},
 			"response": []
 		}

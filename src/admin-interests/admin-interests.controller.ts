@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { AdminInterestsService } from './admin-interests.service';
 import { CreateAdminInterestDto } from './dto/create-admin-interest.dto';
 import { UpdateAdminInterestDto } from './dto/update-admin-interest.dto';
@@ -22,9 +22,9 @@ export class AdminInterestsController {
     return this.adminInterestsService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateAdminInterestDto: UpdateAdminInterestDto) {
-    return this.adminInterestsService.update(+id, updateAdminInterestDto);
+    return this.adminInterestsService.update(id, updateAdminInterestDto);
   }
 
   @Delete(':id')

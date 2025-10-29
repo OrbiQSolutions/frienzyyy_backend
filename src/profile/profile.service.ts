@@ -1,8 +1,7 @@
 import {
   Injectable,
   Logger,
-  NotFoundException,
-  UseGuards,
+  NotFoundException
 } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -15,7 +14,8 @@ import { MatchProfile } from './entities/match.profile.entity';
 import { Interests } from './entities/interests.entity';
 import { AddInterestsDto } from './dto/add.interests.dto';
 import { UserInterests } from 'src/auth/entities/user.interests.entity';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { Op } from 'sequelize';
+import { ChatList } from 'src/chat/entities/chat.list.entity';
 
 @Injectable()
 export class ProfileService {
@@ -35,7 +35,10 @@ export class ProfileService {
     private readonly matchProfileModel: typeof MatchProfile,
 
     @InjectModel(UserInterests)
-    private readonly userInterestModel: typeof UserInterests
+    private readonly userInterestModel: typeof UserInterests,
+
+    @InjectModel(ChatList)
+    private readonly chatList: typeof ChatList
   ) { }
 
   async getMatchedProfiles(request: Request) {
@@ -54,6 +57,9 @@ export class ProfileService {
     }
 
     const matchedProfiles = await this.userModel.findAll({
+      where: {
+        userId: { [Op.ne]: userId }
+      },
       attributes: {
         exclude: ['otp']
       },
@@ -81,7 +87,7 @@ export class ProfileService {
       });
 
       if (status == 0) {
-        return responseBody(201, "Left swiped");
+        return responseBody(201, "Left swiped", { isMatched: false });
       }
 
       const userASwiped = await this.matchProfileModel.findOne({
@@ -92,12 +98,15 @@ export class ProfileService {
       });
 
       if (!userASwiped) {
-        return responseBody(201, "Right swiped");
+        return responseBody(201, "Right swiped", { isMatched: false });
       }
 
+      const chatList = await this.chatList.create({
+        userId: userId,
+        chatUserId: profileUserId
+      });
 
-
-      return responseBody(201, "It's a match");
+      return responseBody(201, "It's a match", { isMatched: true });
     } catch (err) {
 
     }
@@ -119,7 +128,6 @@ export class ProfileService {
     return responseBody(201, "All the interests are added");
   }
 
-  @UseGuards(AuthGuard)
   async findUser(id: string) {
     const user = await this.userModel.findOne({
       where: { userId: id },
@@ -136,6 +144,24 @@ export class ProfileService {
     if (!user) throw new NotFoundException;
 
     return responseBody(200, "The user successfully found", user);
+  }
+
+  async getAllSwipedProfiles(userId: string) {
+    const allSwipedProfiles = await this.matchProfileModel.findAll({
+      where: {
+        userAId: userId
+      },
+      include: [{
+        model: User,
+        as: 'userB',
+        required: false,
+        attributes: {
+          exclude: ['otp', 'resetPasswordToken', 'resetPasswordExpires', 'password']
+        }
+      }]
+    });
+
+    return responseBody(201, "All the fetched profiles have been fetched", allSwipedProfiles);
   }
 
   update(id: number, updateProfileDto: UpdateProfileDto) {

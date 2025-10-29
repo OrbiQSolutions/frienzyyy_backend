@@ -19,16 +19,22 @@ export class AdminInterestsService {
     return responseBody(201, "Interests created successfully", interest);
   }
 
-  findAll() {
-    return `This action returns all adminInterests`;
+  async findAll() {
+    return await this.interestsModel.findAll();
   }
 
   findOne(id: number) {
     return `This action returns a #${id} adminInterest`;
   }
 
-  update(id: number, updateAdminInterestDto: UpdateAdminInterestDto) {
-    return `This action updates a #${id} adminInterest`;
+  async update(id: string, updateAdminInterestDto: UpdateAdminInterestDto) {
+    console.log({ ...updateAdminInterestDto });
+    const updatedInterest = await this.interestsModel.update({ ...updateAdminInterestDto }, {
+      where: {
+        interestId: id
+      }
+    })
+    return responseBody(203, "The interest updated successfully", updatedInterest);
   }
 
   remove(id: number) {

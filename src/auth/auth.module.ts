@@ -9,6 +9,7 @@ import { EmailWorker } from 'src/redis_worker/email.worker';
 import { AuthLog } from './entities/auth.log.entity';
 import { ProfilePicture } from '../user/entities/profile.picture.entity';
 import { Address } from '../address/entities/address.entity';
+import { MatchProfile } from 'src/profile/entities/match.profile.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { Address } from '../address/entities/address.entity';
       UserProfile,
       AuthLog,
       ProfilePicture,
-      Address
+      Address,
+      MatchProfile
     ]),
     BullModule.registerQueue(
       {

@@ -8,6 +8,7 @@ import { MatchProfile } from './entities/match.profile.entity';
 import { UserProfile } from 'src/auth/entities/user.profile.entity';
 import { Interests } from './entities/interests.entity';
 import { UserInterests } from 'src/auth/entities/user.interests.entity';
+import { ChatList } from 'src/chat/entities/chat.list.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { UserInterests } from 'src/auth/entities/user.interests.entity';
       ProfilePicture,
       MatchProfile,
       Interests,
-      UserInterests
+      UserInterests,
+      ChatList
     ])
   ],
   controllers: [ProfileController],
