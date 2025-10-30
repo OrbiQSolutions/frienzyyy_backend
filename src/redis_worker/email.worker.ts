@@ -9,6 +9,16 @@ export class EmailWorker extends WorkerHost {
 
   async process(job: Job): Promise<any> {
     try {
+      const host = process.env.EMAIL_HOST;
+      const port = parseInt(process.env.EMAIL_PORT || '587');
+      const user = process.env.EMAIL_USERNAME;
+      const pass = process.env.EMAIL_PASSWORD;
+
+      this.logger.log(`host: ${host}`);
+      this.logger.log(`port: ${port}`);
+      this.logger.log(`user: ${user}`);
+      this.logger.log(`pass: ${pass}`);
+
       const { to, subject, text, html } = job.data;
       if (!to || !subject) {
         throw new Error('Missing email data');
