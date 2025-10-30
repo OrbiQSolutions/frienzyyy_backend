@@ -89,7 +89,7 @@ export class AuthController {
   @Put('/signup-with-email-interest')
   @HttpCode(HttpStatus.OK)
   async createWithEmailInterest(@Body() reqBody: CreateWithEmailLookingFor, @Req() req: Request) {
-    return this.authService.signupWithEmailInterest(reqBody, req); // FIXED: Remove @Res, consistent return
+    return this.authService.signupWithEmailInterest(reqBody, req);
   }
 
   @Post('/login-user')

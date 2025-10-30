@@ -1,12 +1,12 @@
 import {
+  HttpStatus,
   Injectable,
   Logger,
-  NotFoundException
 } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from 'src/auth/entities/user.entity';
-import responseBody from 'src/core/commonfunctions/response.body';
+import { responseBody } from 'src/core/commonfunctions/response.body';
 import { UserProfile } from 'src/auth/entities/user.profile.entity';
 import { Address } from 'src/address/entities/address.entity';
 import { SwipeDto } from './dto/swipe.dto';
@@ -16,6 +16,8 @@ import { AddInterestsDto } from './dto/add.interests.dto';
 import { UserInterests } from 'src/auth/entities/user.interests.entity';
 import { Op } from 'sequelize';
 import { ChatList } from 'src/chat/entities/chat.list.entity';
+import { message } from 'src/core/constants/message.constants';
+import { InterestDto } from './dto/interest.dto';
 
 @Injectable()
 export class ProfileService {
@@ -41,134 +43,210 @@ export class ProfileService {
     private readonly chatList: typeof ChatList
   ) { }
 
-  async getMatchedProfiles(request: Request) {
-    const { userId } = request['user'];
-    const userProfile = await this.userProfileModel.findOne({
-      where: {
-        userId
+  async getMatchedProfiles(userId: string) {
+    try {
+      this.logger.log(`Fetching matched profiles for user: ${userId}`);
+      const userProfile = await this.userProfileModel.findOne({
+        where: { userId }
+      });
+      let requiredGender = 'other';
+
+      if (userProfile?.gender === 'male') {
+        requiredGender = 'female';
+      } else if (userProfile?.gender === 'female') {
+        requiredGender = 'male';
       }
-    });
-    let requiredGender = "other";
 
-    if (userProfile && userProfile.gender == 'male') {
-      requiredGender = 'female'
-    } else if (userProfile && userProfile.gender == 'female') {
-      requiredGender = 'male';
+      const matchedProfiles = await this.userModel.findAll({
+        where: { userId: { [Op.ne]: userId } },
+        attributes: { exclude: ['password', 'otp'] },
+        include: [
+          {
+            model: UserProfile,
+            as: 'profile',
+            required: true,
+            where: { gender: requiredGender }
+          },
+          { model: Address, as: 'address', required: false }
+        ]
+      });
+      this.logger.log(`Found ${matchedProfiles.length} matched profiles`);
+      return responseBody(HttpStatus.OK, 'Profiles fetched successfully', matchedProfiles);
+    } catch (err) {
+      this.logger.error(`Matched profiles fetch failed: ${err}`);
+      return responseBody(HttpStatus.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
     }
-
-    const matchedProfiles = await this.userModel.findAll({
-      where: {
-        userId: { [Op.ne]: userId }
-      },
-      attributes: {
-        exclude: ['otp']
-      },
-      include: [
-        {
-          model: UserProfile, as: 'profile', required: true, where: {
-            gender: requiredGender
-          }
-        },
-        { model: Address, as: 'address', required: false }
-      ]
-    });
-    return responseBody(201, "The profiles are fetched", matchedProfiles);
   }
 
-  async swipe(swipeDto: SwipeDto, request: Request) {
-    console.log(swipeDto);
-    const { userId } = request['user'];
-    const { profileUserId, status } = swipeDto;
+  async swipe(swipeDto: SwipeDto, userId: string) {
     try {
+      this.logger.log(`Swipe action for user ${userId}: ${JSON.stringify(swipeDto)}`);
+      const { profileUserId, status } = swipeDto;
+      if (profileUserId === userId) {
+        return responseBody(HttpStatus.BAD_REQUEST, 'Cannot swipe self');
+      }
+
       await this.matchProfileModel.create({
         userAId: userId,
         userBId: profileUserId,
         status
       });
 
-      if (status == 0) {
-        return responseBody(201, "Left swiped", { isMatched: false });
+      if (status === 0) { // Left swipe
+        return responseBody(HttpStatus.CREATED, 'Left swiped', { isMatched: false });
       }
 
-      const userASwiped = await this.matchProfileModel.findOne({
+      // Check mutual swipe
+      const mutualSwipe = await this.matchProfileModel.findOne({
         where: {
           userAId: profileUserId,
-          userBId: userId
+          userBId: userId,
+          status: 1 // Right swipe
         }
       });
 
-      if (!userASwiped) {
-        return responseBody(201, "Right swiped", { isMatched: false });
+      if (mutualSwipe) {
+        const chatList = await this.chatList.create({
+          userId,
+          chatUserId: profileUserId
+        });
+        this.logger.log(`Match found between ${userId} and ${profileUserId}`);
+        return responseBody(HttpStatus.CREATED, 'It\'s a match!', { isMatched: true, chatId: chatList.id });
       }
 
-      const chatList = await this.chatList.create({
-        userId: userId,
-        chatUserId: profileUserId
-      });
-
-      return responseBody(201, "It's a match", { isMatched: true });
+      return responseBody(HttpStatus.CREATED, 'Right swiped', { isMatched: false });
     } catch (err) {
-
+      this.logger.error(`Swipe failed: ${err}`);
+      return responseBody(HttpStatus.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
     }
   }
 
   async getAllInterests() {
-    return await this.interestsModel.findAll();
+    try {
+      this.logger.log('Fetching all interests');
+      const allInterests = await this.interestsModel.findAll({
+        order: [['interestName', 'ASC']]
+      });
+      return responseBody(HttpStatus.OK, 'All interests fetched', allInterests);
+    } catch (err) {
+      this.logger.error(`Interests fetch failed: ${err}`);
+      return responseBody(HttpStatus.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async addInterests(addInterestsDto: AddInterestsDto, userId: string) {
-    const { interestsList } = addInterestsDto;
-    this.logger.log(interestsList);
-    if (!interestsList) return responseBody(201, "The list is empty");
-    for (let i = 0; i < interestsList.length; ++i) {
-      const interestId = interestsList[i];
-      await this.userInterestModel.create({ userId, interestId })
-    }
+    try {
+      this.logger.log(`Adding interests for user ${userId}: ${JSON.stringify(addInterestsDto)}`);
+      const { interestsList } = addInterestsDto;
+      if (!interestsList || interestsList.length === 0) {
+        return responseBody(HttpStatus.BAD_REQUEST, 'Interests list is empty');
+      }
 
-    return responseBody(201, "All the interests are added");
+      // Check existing interests to avoid duplicates
+      const existingInterests = await this.userInterestModel.findAll({ where: { userId } });
+      const existingIds = existingInterests.map(i => i.interestId);
+
+      // Extract interestId from InterestDto objects
+      const toAdd = interestsList
+        .map((item: InterestDto) => item.interestId) // Assume InterestDto has interestId
+        .filter((id: string) => !existingIds.includes(id));
+
+      if (toAdd.length === 0) {
+        return responseBody(HttpStatus.OK, 'No new interests to add');
+      }
+
+      const createdInterests: string[] = [];
+      for (const interestId of toAdd) {
+        await this.userInterestModel.create({ userId, interestId });
+        createdInterests.push(interestId);
+      }
+
+      this.logger.log(`Added ${createdInterests.length} interests for user ${userId}`);
+      return responseBody(HttpStatus.CREATED, 'Interests added successfully', createdInterests);
+    } catch (err) {
+      this.logger.error(`Interests add failed: ${err}`);
+      return responseBody(HttpStatus.BAD_REQUEST, message.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  async findUser(id: string) {
-    const user = await this.userModel.findOne({
-      where: { userId: id },
-      attributes: {
-        exclude: ['password', 'otp']
-      },
-      include: [
-        { model: UserProfile, as: 'profile', required: false },
-        { model: Address, as: 'address', required: false },
-        { model: Interests, as: 'interests', required: false, attributes: { exclude: ['UserInterests', 'updatedAt', 'createdAt'] } }
-      ]
-    });
+  async findUser(userId: string) {
+    try {
+      this.logger.log(`Fetching user: ${userId}`);
+      const user = await this.userModel.findOne({
+        where: { userId },
+        attributes: { exclude: ['password', 'otp', 'resetPasswordToken', 'resetPasswordExpires'] },
+        include: [
+          { model: UserProfile, as: 'profile', required: false },
+          { model: Address, as: 'address', required: false },
+          {
+            model: Interests,
+            as: 'interests',
+            required: false,
+            attributes: { exclude: ['UserInterests', 'updatedAt', 'createdAt'] },
+            through: { attributes: [] }
+          }
+        ]
+      });
 
-    if (!user) throw new NotFoundException;
+      if (!user) {
+        return responseBody(HttpStatus.NOT_FOUND, message.USER_DOESNT_EXIST);
+      }
 
-    return responseBody(200, "The user successfully found", user);
+      return responseBody(HttpStatus.OK, 'User found successfully', user);
+    } catch (err) {
+      this.logger.error(`User fetch failed: ${err}`);
+      return responseBody(HttpStatus.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async getAllSwipedProfiles(userId: string) {
-    const allSwipedProfiles = await this.matchProfileModel.findAll({
-      where: {
-        userAId: userId
-      },
-      include: [{
-        model: User,
-        as: 'userB',
-        required: false,
-        attributes: {
-          exclude: ['otp', 'resetPasswordToken', 'resetPasswordExpires', 'password']
-        }
-      }]
-    });
+    try {
+      this.logger.log(`Fetching swiped profiles for user: ${userId}`);
+      const allSwipedProfiles = await this.matchProfileModel.findAll({
+        where: { userAId: userId },
+        include: [{
+          model: User,
+          as: 'userB',
+          required: false,
+          attributes: { exclude: ['otp', 'resetPasswordToken', 'resetPasswordExpires', 'password'] }
+        }]
+      });
 
-    return responseBody(201, "All the fetched profiles have been fetched", allSwipedProfiles);
+      return responseBody(HttpStatus.OK, 'Swiped profiles fetched successfully', allSwipedProfiles);
+    } catch (err) {
+      this.logger.error(`Swiped profiles fetch failed: ${err}`);
+      return responseBody(HttpStatus.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  update(id: number, updateProfileDto: UpdateProfileDto) {
-    return `This action updates a #${id} profile`;
+  async update(id: string, updateProfileDto: UpdateProfileDto) {
+    try {
+      this.logger.log(`Updating profile for ID: ${id}`);
+      const user = await this.userModel.findByPk(id);
+      if (!user) {
+        return responseBody(HttpStatus.NOT_FOUND, message.USER_DOESNT_EXIST);
+      }
+      await user.update(updateProfileDto);
+      const { password, otp, ...updatedUser } = user.get({ plain: true });
+      return responseBody(HttpStatus.OK, message.PROFILE_UPDATED, updatedUser);
+    } catch (err) {
+      this.logger.error(`Profile update failed: ${err}`);
+      return responseBody(HttpStatus.BAD_REQUEST, message.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} profile`;
+  async remove(id: string) {
+    try {
+      this.logger.log(`Deleting profile for ID: ${id}`);
+      const user = await this.userModel.findByPk(id);
+      if (!user) {
+        return responseBody(HttpStatus.NOT_FOUND, message.USER_DOESNT_EXIST);
+      }
+      await user.destroy();
+      return responseBody(HttpStatus.OK, message.DELETED_SUCCESS);
+    } catch (err) {
+      this.logger.error(`Profile delete failed: ${err}`);
+      return responseBody(HttpStatus.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
+    }
   }
 }
