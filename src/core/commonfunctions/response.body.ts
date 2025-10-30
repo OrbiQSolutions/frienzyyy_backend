@@ -1,21 +1,16 @@
-export default function responseBody(
-  status: any,
+import { ApiResponse } from "./api.response";
+import { ResponseUtils } from "./response.utils";
+
+export function responseBody<T = any>(
+  status: number,
   message: string,
-  data?: any,
+  data?: T,
   token?: string,
-) {
-  let res: any = {
-    status,
-    message,
+  error?: string,
+): ApiResponse<T> {
+  if (status >= 200 && status < 300) {
+    return ResponseUtils.success(data, message, status);
+  } else {
+    return ResponseUtils.error(status, message, error);
   }
-
-  if (token) {
-    res.token = token;
-  }
-
-  if (data) {
-    res.data = data;
-  }
-
-  return res;
 }

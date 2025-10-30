@@ -1,4 +1,4 @@
-export class CreateWithEmailName {
+export class CreateWithEmailNameDto {
   email: String;
   name: String;
 }
