@@ -6,7 +6,7 @@ import {
   Model,
   BelongsTo
 } from "sequelize-typescript";
-import { User } from "src/auth/entities/user.entity";
+import { User } from "../../auth/entities/user.entity";
 
 @Table({
   tableName: "match_profile"

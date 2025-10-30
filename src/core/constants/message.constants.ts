@@ -1,6 +1,18 @@
 export const message = {
   INTERNAL_SERVER_ERROR: 'Internal server error',
-  USER_DOESNT_EXIST: "The user does not exist",
-  NAME_UPDATED_SUCCESSFULLY: "Name has been updated successfully",
-  DATA_ALREADY_ADDED: "The data has been already added"
-}
+  USER_DOESNT_EXIST: 'The user does not exist',
+  NAME_UPDATED_SUCCESSFULLY: 'Name has been updated successfully',
+  DATA_ALREADY_ADDED: 'The data has been already added',
+  REGISTRATION_SUCCESS: 'User registered successfully',
+  LOGIN_SUCCESS: 'Login successful',
+  OTP_VERIFIED: 'OTP verified successfully',
+  PASSWORD_UPDATED: 'Password updated successfully',
+  PROFILE_UPDATED: 'Profile updated successfully',
+  DELETED_SUCCESS: 'Resource deleted successfully',
+  NOT_FOUND: 'Resource not found',
+  INVALID_CREDENTIALS: 'Invalid credentials',
+  INVALID_TOKEN: 'Invalid or expired token',
+  EMAIL_EXISTS: 'Email already registered',
+  OTP_INVALID: 'Invalid OTP',
+  BAD_STATUS: 'Bad request',
+} as const;

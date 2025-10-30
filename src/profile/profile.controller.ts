@@ -8,61 +8,78 @@ import {
   Delete,
   UseGuards,
   Req,
-  Put
+  Put,
+  HttpCode,
+  HttpStatus,
+  ForbiddenException
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
 import { SwipeDto } from './dto/swipe.dto';
 import { AddInterestsDto } from './dto/add.interests.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('profile')
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) { }
 
   @UseGuards(AuthGuard)
-  @Post('/get-profiles')
+  @Get('/get-profiles')
+  @HttpCode(HttpStatus.OK)
   async getMatchedProfiles(@Req() request: Request) {
-    return await this.profileService.getMatchedProfiles(request);
+    return this.profileService.getMatchedProfiles(request['user'].userId);
   }
 
   @UseGuards(AuthGuard)
   @Post('/swipe')
+  @HttpCode(HttpStatus.CREATED)
   async swipe(@Body() swipeDto: SwipeDto, @Req() request: Request) {
-    return this.profileService.swipe(swipeDto, request);
+    return this.profileService.swipe(swipeDto, request['user'].userId);
   }
 
   @Get('/get-all-interests')
+  @HttpCode(HttpStatus.OK)
   async getAllInterests() {
-    return await this.profileService.getAllInterests();
+    return this.profileService.getAllInterests();
   }
 
   @UseGuards(AuthGuard)
   @Put('/add-interests')
+  @HttpCode(HttpStatus.OK)
   async addInterests(@Body() addInterestsDto: AddInterestsDto, @Req() request: Request) {
-    const { userId } = request['user'];
-    return await this.profileService.addInterests(addInterestsDto, userId);
+    return this.profileService.addInterests(addInterestsDto, request['user'].userId);
   }
 
   @UseGuards(AuthGuard)
   @Post('/get-all-swiped-profiles')
+  @HttpCode(HttpStatus.OK)
   async getAllSwipedProfiles(@Req() request: Request) {
-    const { userId } = request['user'];
-    return await this.profileService.getAllSwipedProfiles(userId);
+    return this.profileService.getAllSwipedProfiles(request['user'].userId);
   }
 
   @Get(':userId')
+  @HttpCode(HttpStatus.OK)
   async findUser(@Param('userId') userId: string) {
-    return await this.profileService.findUser(userId);
+    return this.profileService.findUser(userId);
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profileService.update(+id, updateProfileDto);
+  @HttpCode(HttpStatus.OK)
+  async update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto, @Req() req: Request) {
+    if (req['user'].userId !== id) {
+      throw new ForbiddenException('Access denied');
+    }
+    return this.profileService.update(id, updateProfileDto);
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.profileService.remove(+id);
+  @HttpCode(HttpStatus.OK)
+  async remove(@Param('id') id: string, @Req() req: Request) {
+    if (req['user'].userId !== id) {
+      throw new ForbiddenException('Access denied');
+    }
+    return this.profileService.remove(id);
   }
 }

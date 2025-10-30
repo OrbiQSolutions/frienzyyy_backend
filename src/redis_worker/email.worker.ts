@@ -1,7 +1,7 @@
 import { OnWorkerEvent, Processor, WorkerHost } from "@nestjs/bullmq";
 import { Logger } from "@nestjs/common";
 import { Job } from "bullmq";
-import { sendEmail } from "src/core/commonfunctions/send.email";
+import { sendEmail } from "../core/commonfunctions/send.email";
 
 @Processor("emails")
 export class EmailWorker extends WorkerHost {
