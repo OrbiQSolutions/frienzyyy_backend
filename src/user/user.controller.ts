@@ -11,7 +11,8 @@ import {
   HttpStatus,
   UseInterceptors,
   UseGuards,
-  Req
+  Req,
+  HttpCode
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -28,49 +29,18 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Post('/upload-profile-picture')
-  @UseInterceptors(FileInterceptor('file'))
-  addProfilePicture(
+  @UseInterceptors(FileInterceptor('file')) // FIXED: Single file upload
+  @HttpCode(HttpStatus.CREATED)
+  async uploadProfilePicture(
     @Body() body: ProfilePictureDto,
     @UploadedFile(
       new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: '.(png|jpeg|jpg)'
-        })
-        .addMaxSizeValidator({
-          maxSize: 1000000,
-          message: 'Image cannot be more than 1MB'
-        })
-        .build({
-          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
-        })
-    ) image: Express.Multer.File,
-    @Req() request: Request
+        .addFileTypeValidator({ fileType: /(jpg|jpeg|png)$/ }) // FIXED: Regex for image types
+        .addMaxSizeValidator({ maxSize: 5242880, message: 'File too large (max 5MB)' }) // FIXED: 5MB limit
+        .build({ errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY })
+    ) file: Express.Multer.File,
+    @Req() request: Request,
   ) {
-    return this.userService.addProfilePicture(body, image, request);
-  }
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    return this.userService.uploadProfilePicture(body, file, request['user'].userId);
   }
 }
