@@ -105,7 +105,7 @@ export class AuthService {
         return responseBody(HttpStatus.BAD_REQUEST, message.EMAIL_EXISTS);
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, String(process.env.BCRYPT_SALT));
       const newUser = await this.userModel.create({
         email,
         password: hashedPassword,
@@ -176,7 +176,7 @@ export class AuthService {
         return responseBody(HttpStatus.METHOD_NOT_ALLOWED, 'Password already set');
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, String(process.env.BCRYPT_SALT));
       const [updatedCount] = await this.userModel.update(
         { password: hashedPassword },
         { where: { email } }
