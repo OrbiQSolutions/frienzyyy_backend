@@ -10,9 +10,7 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
-import { responseBody } from 'src/core/commonfunctions/response.body';
 import { UserProfile } from './entities/user.profile.entity';
-import { message } from 'src/core/constants/message.constants';
 import { CreateWithEmailVerify } from './dto/create.with.email.verify';
 import { CreateWithEmailNameDto } from './dto/create.with.email.name';
 import { CreateWithEmailDob } from './dto/create.with.email.dob';
@@ -27,6 +25,8 @@ import { LoginPasswordDto } from './dto/login.password.dto';
 import { BioDto } from './dto/bio.sto';
 import * as bcrypt from 'bcrypt';
 import { PasswordDto } from './dto/password.dto';
+import { responseBody } from '../core/commonfunctions/response.body';
+import { message } from '../core/constants/message.constants';
 
 @Injectable()
 export class AuthService {

@@ -15,9 +15,9 @@ import {
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
 import { SwipeDto } from './dto/swipe.dto';
 import { AddInterestsDto } from './dto/add.interests.dto';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('profile')
 export class ProfileController {

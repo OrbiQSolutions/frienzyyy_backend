@@ -5,19 +5,19 @@ import {
 } from '@nestjs/common';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from 'src/auth/entities/user.entity';
-import { responseBody } from 'src/core/commonfunctions/response.body';
-import { UserProfile } from 'src/auth/entities/user.profile.entity';
-import { Address } from 'src/address/entities/address.entity';
 import { SwipeDto } from './dto/swipe.dto';
 import { MatchProfile } from './entities/match.profile.entity';
 import { Interests } from './entities/interests.entity';
 import { AddInterestsDto } from './dto/add.interests.dto';
-import { UserInterests } from 'src/auth/entities/user.interests.entity';
 import { Op } from 'sequelize';
-import { ChatList } from 'src/chat/entities/chat.list.entity';
-import { message } from 'src/core/constants/message.constants';
 import { InterestDto } from './dto/interest.dto';
+import { User } from '../auth/entities/user.entity';
+import { UserProfile } from '../auth/entities/user.profile.entity';
+import { UserInterests } from '../auth/entities/user.interests.entity';
+import { ChatList } from '../chat/entities/chat.list.entity';
+import { Address } from '../address/entities/address.entity';
+import { responseBody } from '../core/commonfunctions/response.body';
+import { message } from '../core/constants/message.constants';
 
 @Injectable()
 export class ProfileService {

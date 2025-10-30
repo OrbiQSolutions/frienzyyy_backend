@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { CreateAdminInterestDto } from './dto/create-admin-interest.dto';
 import { UpdateAdminInterestDto } from './dto/update-admin-interest.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Interests } from 'src/profile/entities/interests.entity';
-import responseBody from 'src/core/commonfunctions/response.body';
+import { Interests } from '../profile/entities/interests.entity';
+import { responseBody } from '../core/commonfunctions/response.body';
 
 @Injectable()
 export class AdminInterestsService {

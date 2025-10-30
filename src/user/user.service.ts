@@ -1,10 +1,10 @@
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ProfilePictureDto } from './dto/profile.picture.dto';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
-import { responseBody } from 'src/core/commonfunctions/response.body';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProfilePicture } from './entities/profile.picture.entity';
-import { message } from 'src/core/constants/message.constants';
+import { responseBody } from '../core/commonfunctions/response.body';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { message } from '../core/constants/message.constants';
 
 @Injectable()
 export class UserService {

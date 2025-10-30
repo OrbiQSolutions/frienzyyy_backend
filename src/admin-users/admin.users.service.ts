@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { CreateAdminUserDto } from './dto/create-admin.user.dto';
 import { UpdateAdminUserDto } from './dto/update-admin.user.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { User } from 'src/auth/entities/user.entity';
-import responseBody from 'src/core/commonfunctions/response.body';
-import { UserProfile } from 'src/auth/entities/user.profile.entity';
+import { User } from '../auth/entities/user.entity';
+import { UserProfile } from '../auth/entities/user.profile.entity';
+import { responseBody } from '../core/commonfunctions/response.body';
 
 @Injectable()
 export class AdminUsersService {
