@@ -18,7 +18,7 @@ import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { CreateWithEmailVerify } from './dto/create.with.email.verify';
 import { CreateWithEmailDob } from './dto/create.with.email.dob';
-import type { Response, Request } from 'express';
+import type { Request } from 'express';
 import { AuthGuard } from './auth.guard';
 import { CreateWithEmailGender } from './dto/create.with.email.gender.dto';
 import { CreateWithEmailLookingFor } from './dto/create.with.email.lookingfor.dto';
@@ -35,7 +35,7 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('/validate-token')
   @HttpCode(HttpStatus.OK)
-  async validateToken(@Req() req: Request, @Res() res: Response) {
+  async validateToken(@Req() req: Request) {
     return this.authService.validateToken(req);
   }
 
