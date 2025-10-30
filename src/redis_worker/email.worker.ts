@@ -9,12 +9,16 @@ export class EmailWorker extends WorkerHost {
 
   async process(job: Job): Promise<any> {
     try {
-      await sendEmail(job.data.to, job.data.subject, job.data.text, job.data.html);
-      this.logger.log(`Mail sent to ${job.data.to} for user sign up`);
-      return;
+      const { to, subject, text, html } = job.data;
+      if (!to || !subject) {
+        throw new Error('Missing email data');
+      }
+      await sendEmail(to, subject, text, html || text);
+      this.logger.log(`Mail sent to ${to} for user sign up`);
+      return { success: true };
     } catch (err) {
-      this.logger.error("The error occurred while sendin email");
-      return;
+      this.logger.error(`Email send failed for job ${job.id}: ${err.message}`);
+      throw err;
     }
   }
 
